@@ -1,0 +1,48 @@
+Multitris - Protokoll 1.0
+
+======= Server-Befehle ========
+
+CHUCK x
+(in jeder Phase) ist eine PING-Anfrage (x ist eine Zahl >= 1), Antwort: NORRIS x
+
+FUCKYOU[ msg]
+(in jeder Phase) Sendet der Server in jedem Fall, bevor der die Verbindung zum Client beendet (z.B. wegen Timeout); msg ist optionale Nachricht, die dem gekickten User angezeigt werden sollte
+
+ATTENTION xxxxxx y
+(in LogIn-Phase) LogIn-Phase erfolgreich beendet, es startet ein Spiel. Der Client bekommt die HEX-Farbe #xxxxxx und die Zahl y (>= 1) als Spieleridentifikation zugewiesen; wechsle in Warte-Phase
+
+GOFORREST
+(in Warte-Phase) Es entsteht ein Tetris-Element des Clients, ab jetzt kann gesteuert werden. Wechsle in Action-Phase
+
+PLONK
+(in Action-Phase) Das Tetris-Element des Clients ist am Boden angekommen und kann nicht mehr gesteuert werden. Wechsle in Warte-Phase
+
+NOTBAD
+(in Warte-Phase) Die User haben gewonnen (wie auch immer das funktionieren kann); Wechsle in LogIn-Phase
+
+THATWASMISERABLE
+(in Warte-Phase) Die User haben verloren; Wechsle in LogIn-Phase
+
+
+
+======= Client-Befehle =======
+
+Nach Verbindungsaufbau sendet der Client die Nachricht
+IWANTFUN x
+x ist die implementierte Protokollversion (hier 1.0); danach ist der Client in der LogIn-Phase, d.h. er wartet darauf dass ein Spiel gestartet wird. An startenden Spielen nimmt der Client automatisch teil, es ist also keine weitere Aktion erforderlich
+
+NORRIS x
+(in jeder Phase) ist die einzig korrekte Antwort auf die "CHUCK x"-Anfrage des Servers; muss innerhalb der Timeout-Zeit gegeben werden
+
+LAFONTAINE
+(in Action-Phase) Das Tetris-Element des Clients soll eine Spalte nach links verschoben werden
+
+STOIBER
+(in Action-Phase) Das Tetris-Element des Clients soll eine Spalte nach rechts verschoben werden
+
+TURN
+(in Action-Phase) Das Tetris-Element des Clients soll gegen den Uhrzeigersinn gedreht werden; ein Drehen im Uhrzeigersinn ist nicht m�glich
+
+
+Fehlerhafte Befehle des Clients werden vom Server stillschweigend ignoriert oder ggf. durch FUCKYOU und Verbindungsabbruch bestraft.
+Die Timeout-Zeit liegt v�llig im Ermessen des Servers. Der Client sollte sich also mit seinen NORRIS-Antworten beeilen.
