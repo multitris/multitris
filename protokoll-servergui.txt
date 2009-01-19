@@ -1,0 +1,56 @@
+Multitris - Protokoll 0.1 Server <-> GUI
+
+
+Server und GUI kommunizieren durch Befehle, die durch \n terminiert werden.
+
+======= GUI-Befehle =======
+
+CHUCK x
+ist eine PING-Anfrage (x ist eine Zahl >= 1), erwartete Antwort des Servers: NORRIS x
+
+
+
+======= Server-Befehle ========
+
+SIZE w h
+Wird entweder direkt vor einem RESET / RESET FIELD.... oder direkt zu Anfang aufgerufen. Teilt der GUI die Größe des aktuellen Spielfelds mit. (w ist Breite, h die Höhe)
+
+AUTH str
+Damit sich nur User verbinden können, die die GUI betrachten können, zeigt die GUI den übergebenen String irgendwo an. Dieser String muss von den Usern bei ihrem LogIn dann angegeben werden, um sich verbinden zu können. Der Server sollte nach Verbindungsaufbau zur GUI einen solchen String übergeben, kann ihn aber beliebig oft verändern.
+
+NORRIS x
+ist die einzig korrekte Antwort auf die CHUCK x-Anfrage der GUI
+
+COLOR n xxxxxx
+Definiert die Farbe Nr. n durch Angabe ihres HEX-Wertes. Ein Überschreiben des alten HEX-Wertes ist möglich. n muss >= 1 sein.
+
+PLAYER n[ name]
+Zur Farbe mit Nr. n gehört der angebene Spielername (Werte ohne Newline, Leerzeichen sind ok, aber bitte bitte erst mal ASCII). Die GUI kann die Kombination aus Farbe und Spielernamen beispielsweise in einer Seitenspalte ausgeben. Wird kein Name übergeben, existiert kein Spieler (mehr) zu dieser Farbe.
+
+SET row column color[ special]
+row, column, color sind Integer, das optionale special-Argument ein beliebiger String ohne Newline.
+Setzt den "Tetris-Pixel" an der Stelle (row, column) auf die entsprechende Farbe. color=0 bedeutet, dass dort kein Tetrix-Block existiert.
+Ist "special" gegeben, soll bei der Darstellung des neuen Spielstatus (beim FLUSH-Aufruf) das angegebene Extra angezeigt werden.
+Möglich ist bisher nur der special-Wert "explode": Lass die vorher dort existenten Steine explodieren (normalerweise durch eine volle Reihe ausgelöst).
+Der bloße SET-Befehl erzeugt ohne FLUSH noch keine sichtbare Veränderung der GUI!
+Der "row"-Wert wird in "Ebenen über dem Boden" gemessen (unterste Schicht ist 0, darüber 1, usw.); der "col"-Wert zählt von links nach rechts hoch (die Spalte ganz links hat die Zahl 0, rechts daneben die 1, usw.).
+
+FLUSH
+Zeige die zuvor durch SET-Befehle ausgelösten Veränderungen an. Spiele dabei ggf. zuvor angegebene Extras ab.
+
+MESSAGE str
+Zeige die übergebene Nachricht (ohne Newline) an. Der GUI sei überlassen, ob sie mehrere empfangene Nachrichten gleichzeitig oder nur die jeweils aktuellste Nachricht anzeigt. (Gedacht für Nachrichten wie "Du bist ja so toll, Spieler1.")
+
+POINTS n p
+Setzt den Punktezähler des Spielers mit Nr. n auf p. p ist eine nicht negative Zahl.
+
+RESET[ FIELD| PLAYERS| COLORS| POINTS| MESSAGES]*
+Führe einen Reset der angebenen Komponente(n) bzw. - falls kein Argument übergeben - aller Komponenten durch:
+* FIELD: Spielfeld neu erzeugen, alle Tetris-Pixel auf 0 setzen
+* PLAYERS: Vergiss die Zuordnung zwischen Spielernamen und Farbnr.
+* COLORS: Vergiss die Zuordnung zwischen Farbnummer und HEX-Wert.
+* POINTS: Vergiss die Zuordnung zwischen Farb/spielernr. und Punkten. (führe einen Reset auf 0 durch)
+* MESSAGES: Vergiss alle gesendeten Nachrichten. GUIs sollten nach diesem Aufruf keine einzige Nachricht mehr anzeigen.
+
+WINNERS[ n]*
+Zeige die Spieler mit den angegebenen Nummern als Gewinner an. Wird kein Gewinner angegeben, haben alle Spieler verloren.
