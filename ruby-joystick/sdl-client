@@ -1,0 +1,109 @@
+#!/usr/bin/ruby
+#
+# Author:: Johannes Krude
+# Copyright:: (c) Johannes Krude 2008
+# License:: AGPL3
+#
+#--
+# This file is part of multitris.
+#
+# multitris is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multitris is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with multitris.  If not, see <http://www.gnu.org/licenses/>.
+#++
+
+KEY_LEFT= 276
+KEY_RIGHT= 275
+KEY_TURN= 32
+KEY_QUIT= 27
+
+JOY_LEFT= 7
+JOY_RIGHT= 5
+JOY_TURN= 12
+JOY_QUIT= 3
+
+
+require 'client'
+require 'sdl'
+
+if ARGV.size != 2
+	STDERR.puts "usage: ./sdl-client server port"
+	exit 1
+end
+
+SDL.init SDL::INIT_VIDEO | SDL::INIT_JOYSTICK
+screen = SDL::setVideoMode 320,240,16, SDL::SWSURFACE|SDL::ANYFORMAT
+SDL::Joystick.num.times do |i|
+	SDL::Joystick.open(i)
+end
+
+client= Multitris::Client.new
+
+control= false
+
+Thread.new do
+	loop do
+		while event=SDL::Event.poll
+			if (SDL::Event::KeyDown===event and event.sym==KEY_QUIT) or (SDL::Event::JoyButtonDown===event and event.button==JOY_QUIT)
+				client.close
+				exit
+			end
+			next unless control
+			case event
+			when SDL::Event::KeyDown
+				case event.sym
+				when KEY_LEFT
+					client.left
+				when KEY_RIGHT
+					client.right
+				when KEY_TURN
+					client.turn
+				else
+					puts event.sym
+				end
+			when SDL::Event::JoyButtonDown
+				case event.button
+				when JOY_LEFT
+					client.left
+				when JOY_RIGHT
+					client.right
+				when JOY_TURN
+					client.turn
+				else
+					puts event.button
+				end
+			
+			end
+		end
+	end
+end
+
+begin
+	client.connect(ARGV[0], ARGV[1]) do |message|
+		case message
+		when "GOFORREST"
+			control= true
+		when "PLONK"
+			control= false
+		when /^ATTENTION (\w\w\w\w\w\w) (\d+)$/
+			puts "You are player number #{$2}"
+			puts "Your color is ##{$1}"
+		else
+			puts message
+		end
+	end
+rescue Errno::ECONNREFUSED
+	STDERR.puts "Connection refused"
+	exit 2
+end
+exit
+

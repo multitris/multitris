@@ -34,20 +34,29 @@ Version= "1.0"
 		# returns the messages the server states as reason
 		# for disconnecting.
 		def connect(server, port)
-			@connection= TCPSocket.new(server, port)
-			@connection.print "IWANTFUN #{Version}\n"
-			@connection.each do |line|
-				line.strip!
-				case line
-				when /^CHUCK (\d+)$/ #ping
-					@connection.print "NORRIS #{$1}\n"
-				when /^FUCKYOU( .+?)$/
-					@connection.close
-					return $1
-				when /^(ATTENTION \w\w\w\w\w\w \d+)|(GOFORREST)|(PLONK)|(NOTBAD)|(THATWASMISERABLE)$/
-					yield line if block_given?
+			begin
+				@connection= TCPSocket.new(server, port)
+				@connection.print "IWANTFUN #{Version}\n"
+				@connection.each do |line|
+					line.strip!
+					case line
+					when /^CHUCK (\d+)$/ #ping
+						@connection.print "NORRIS #{$1}\n"
+					when /^FUCKYOU( .+?)$/
+						@connection.close
+						return $1
+					when /^(ATTENTION \w\w\w\w\w\w \d+)|(GOFORREST)|(PLONK)|(NOTBAD)|(THATWASMISERABLE)$/
+						yield line if block_given?
+					end
 				end
+			rescue IOError
+				return
 			end
+		end
+
+		# Close the connection to the server
+		def close
+			@connection.close
 		end
 
 		# Move the tetris block one to the left.
