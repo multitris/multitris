@@ -1,0 +1,24 @@
+Joystick-Ruby 0.1.0 README
+==========================
+
+This document was last updated on Sat Feb 15 04:14:23 2003.  Please see
+the file COPYING for licensing and warranty information.  The latest
+version of this software is available at
+http://www.pablotron.org/software/joystick-ruby/
+
+Introduction
+============
+Joystick-Ruby is a Ruby binding that allows you to to read joystick
+devices in Linux with an event-driven interface.
+
+Installing Joystick-Ruby
+========================
+Execute the following commands:
+
+# ruby extconf.rb
+# make && su -c 'make install'
+
+About the Author
+================
+Paul Duncan <pabs@pablotron.org>
+http://www.pablotron.org/

@@ -1,0 +1,9 @@
+./depend
+./joystick.c
+./MANIFEST
+./extconf.rb
+./examples/xo.rb
+./examples/jsdump.rb
+./TODO
+./README
+./COPYING

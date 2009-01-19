@@ -1,0 +1,32 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>value (Joystick::Event)</title>
+<link rel=StyleSheet href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body bgcolor="white">
+<pre>/* 
+ * Return the value of this Joystick::Event object.
+ *
+ * The content of Joystick::Event#value varies depending on the type of
+ * event.  For Joystick::Event::AXIS events, the value is the direction
+ * (and optionally magnitude) of the axis (eg, -32767 for maximum
+ * right/up, 19931 for partial left/down, etc).  For
+ * Joystick::Event:BUTTON events, the value is usually 1 or 0, for
+ * button presses and button releases, respectively.
+ * 
+ * Aliases:
+ *   Joystick::Event#val
+ *
+ * Example:
+ *   puts &quot;The button was &quot; &lt;&lt; 
+ *        ((ev.value != 0) ? 'pressed' : 'released') &lt;&lt;
+ *        &quot;.&quot; if ev.type == Joystick::Event::BUTTON
+ *
+ */
+static VALUE j_ev_value(VALUE self) {
+</pre>
+</body>
+</html>

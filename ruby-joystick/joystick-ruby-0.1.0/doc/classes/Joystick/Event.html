@@ -1,0 +1,215 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Joystick::Event</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel=StyleSheet href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript" language="JavaScript">
+  <!--
+  function popCode(url) {
+    window.open(url, "Code", 
+          "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  //-->
+  </script>
+</head>
+
+<body bgcolor="white">
+
+<table summary="Information on class" width="100%" border="0" cellspacing="0">
+ <tr class="title-row">
+ <td class="big-title-font">
+   <sup><font color="aqua">Class</font></sup> Joystick::Event
+ </td>
+ <td align="right">
+   <table summary="layout" cellspacing="0" cellpadding="2">
+     <tr valign="top">
+      <td class="small-title-font">In:</td>
+      <td class="small-title-font">
+        <a href="../../files/joystick_c.html" class="aqua">
+joystick.c
+         </a>
+<br />
+      </td>
+     </tr>
+     <tr>
+      <td class="small-title-font">Parent:</td>
+      <td class="small-title-font">
+Object
+      </td>
+     </tr>
+   </table>
+  </td>
+  </tr>
+</table>
+  <!-- banner header -->
+
+
+
+
+
+<table summary="Methods" cellpadding="5" width="100%">
+<tr><td class="tablesubtitle">Methods</td></tr>
+</table>
+<div class="name-list">
+<a href="#M000011">initialize</a>&nbsp; &nbsp;
+<a href="#M000015">number</a>&nbsp; &nbsp;
+<a href="#M000012">time</a>&nbsp; &nbsp;
+<a href="#M000014">type</a>&nbsp; &nbsp;
+<a href="#M000013">value</a>&nbsp; &nbsp;
+</div>
+
+
+
+
+<table summary="Method list" cellpadding="5" width="100%">
+<tr><td class="tablesubtitle">Public Class methods</td></tr>
+</table>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000011"></a>
+<a href="Event.src/M000011.html" target="Code" class="methodtitle"
+ onClick="popCode('Event.src/M000011.html');return false;">
+<b>initialize</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Constructor for <a href="Event.html">Joystick::Event</a> objects.
+</p>
+<p>
+Note: you should never call this method directly.
+</p>
+</div>
+<table summary="Method list" cellpadding="5" width="100%">
+<tr><td class="tablesubtitle">Public Instance methods</td></tr>
+</table>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000012"></a>
+<a href="Event.src/M000012.html" target="Code" class="methodtitle"
+ onClick="popCode('Event.src/M000012.html');return false;">
+<b>time</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the timestamp (in milliseconds) of this <a
+href="Event.html">Joystick::Event</a>.
+</p>
+<p>
+Example:
+</p>
+<pre>
+  stamp = ev.time
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000013"></a>
+<a href="Event.src/M000013.html" target="Code" class="methodtitle"
+ onClick="popCode('Event.src/M000013.html');return false;">
+<b>value</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the value of this <a href="Event.html">Joystick::Event</a> object.
+</p>
+<p>
+The content of Joystick::Event#value varies depending on the type of event.
+For Joystick::Event::AXIS events, the value is the direction (and
+optionally magnitude) of the axis (eg, -32767 for maximum right/up, 19931
+for partial left/down, etc). For <a
+href="Event.html">Joystick::Event</a>:BUTTON events, the value is usually 1
+or 0, for button presses and button releases, respectively.
+</p>
+<p>
+Aliases:
+</p>
+<pre>
+  Joystick::Event#val
+</pre>
+<p>
+Example:
+</p>
+<pre>
+  puts &quot;The button was &quot; &lt;&lt;
+       ((ev.value != 0) ? 'pressed' : 'released') &lt;&lt;
+       &quot;.&quot; if ev.type == Joystick::Event::BUTTON
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000014"></a>
+<a href="Event.src/M000014.html" target="Code" class="methodtitle"
+ onClick="popCode('Event.src/M000014.html');return false;">
+<b>type</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the type of this <a href="Event.html">Joystick::Event</a> object.
+</p>
+<p>
+Values:
+</p>
+<pre>
+  Joystick::Event::INIT
+  Joystick::Event::BUTTON
+  Joystick::Event::AXIS
+</pre>
+<p>
+Example:
+</p>
+<pre>
+  case ev.type
+  when Joystick::Event::INIT
+    puts 'init'
+  when Joystick::Event::BUTTON
+    puts &quot;button: #{ev.num}, #{ev.val}&quot;
+  when Joystick::Event::AXIS
+    puts &quot;axis: #{ev.num}, #{ev.val}&quot;
+  end
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000015"></a>
+<a href="Event.src/M000015.html" target="Code" class="methodtitle"
+ onClick="popCode('Event.src/M000015.html');return false;">
+<b>number</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the number of this <a href="Event.html">Joystick::Event</a> object.
+</p>
+<p>
+The value of Joystick::Event#number is the axis or button of the event.
+</p>
+<p>
+Aliases:
+</p>
+<pre>
+  Joystick::Event#num
+</pre>
+<p>
+Example:
+</p>
+<pre>
+  puts &quot;You're using joypad #{(ev.num / 2) + 1}.&quot; \
+    if ev.type == Joystick::Event::AXIS
+</pre>
+</div>
+
+</body>
+</html>

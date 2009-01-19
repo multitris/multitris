@@ -1,0 +1,10 @@
+* Sat Feb 15 04:25:37 2003, pabs <pabs@pablotron.org
+  * joystick.c: added Joystick::Device#fd
+
+* Sat Feb 15 13:52:16 2003, pabs <pabs@pablotron.org>
+  * joystick.c: documentation about block form of Device#new
+  * joystick.c: warning about static event structure per device
+  * joystick.c: check to make sure device fd isn't > MAX_JOYSTICKS
+
+* Sat Feb 15 14:02:22 2003, pabs <pabs@pablotron.org>
+  * released 0.1.0

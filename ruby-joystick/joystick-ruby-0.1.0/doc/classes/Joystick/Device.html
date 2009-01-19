@@ -1,0 +1,334 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Joystick::Device</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel=StyleSheet href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript" language="JavaScript">
+  <!--
+  function popCode(url) {
+    window.open(url, "Code", 
+          "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  //-->
+  </script>
+</head>
+
+<body bgcolor="white">
+
+<table summary="Information on class" width="100%" border="0" cellspacing="0">
+ <tr class="title-row">
+ <td class="big-title-font">
+   <sup><font color="aqua">Class</font></sup> Joystick::Device
+ </td>
+ <td align="right">
+   <table summary="layout" cellspacing="0" cellpadding="2">
+     <tr valign="top">
+      <td class="small-title-font">In:</td>
+      <td class="small-title-font">
+        <a href="../../files/joystick_c.html" class="aqua">
+joystick.c
+         </a>
+<br />
+      </td>
+     </tr>
+     <tr>
+      <td class="small-title-font">Parent:</td>
+      <td class="small-title-font">
+Object
+      </td>
+     </tr>
+   </table>
+  </td>
+  </tr>
+</table>
+  <!-- banner header -->
+
+
+
+
+
+<table summary="Methods" cellpadding="5" width="100%">
+<tr><td class="tablesubtitle">Methods</td></tr>
+</table>
+<div class="name-list">
+<a href="#M000006">axes</a>&nbsp; &nbsp;
+<a href="#M000007">buttons</a>&nbsp; &nbsp;
+<a href="#M000010">close</a>&nbsp; &nbsp;
+<a href="#M000009">fd</a>&nbsp; &nbsp;
+<a href="#M000003">initialize</a>&nbsp; &nbsp;
+<a href="#M000008">name</a>&nbsp; &nbsp;
+<a href="#M000001">new</a>&nbsp; &nbsp;
+<a href="#M000005">next_event</a>&nbsp; &nbsp;
+<a href="#M000002">open</a>&nbsp; &nbsp;
+<a href="#M000004">pending?</a>&nbsp; &nbsp;
+</div>
+
+
+
+
+<table summary="Method list" cellpadding="5" width="100%">
+<tr><td class="tablesubtitle">Public Class methods</td></tr>
+</table>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000001"></a>
+<a href="Device.src/M000001.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000001.html');return false;">
+<b>new</b>(VALUE klass, VALUE path)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Open and allocate a new <a href="Device.html">Joystick::Device</a> object.
+</p>
+<p>
+This method also accepts a block.
+</p>
+<p>
+Aliases:
+</p>
+<pre>
+  Joystick::Device::open
+</pre>
+<p>
+Examples:
+</p>
+<pre>
+  joy = Joystick::Device.new '/dev/input/js0'
+
+  # read a joystick device in block mode
+  Joystick::Device::open('/dev/input/js0') { |joy|
+    # ... do stuff ...
+  }
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000002"></a>
+<a href="Device.src/M000002.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000002.html');return false;">
+<b>open</b>(VALUE klass, VALUE path)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Open and allocate a new <a href="Device.html">Joystick::Device</a> object.
+</p>
+<p>
+This method also accepts a block.
+</p>
+<p>
+Aliases:
+</p>
+<pre>
+  Joystick::Device::open
+</pre>
+<p>
+Examples:
+</p>
+<pre>
+  joy = Joystick::Device.new '/dev/input/js0'
+
+  # read a joystick device in block mode
+  Joystick::Device::open('/dev/input/js0') { |joy|
+    # ... do stuff ...
+  }
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000003"></a>
+<a href="Device.src/M000003.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000003.html');return false;">
+<b>initialize</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Constructor for <a href="Device.html">Joystick::Device</a>.
+</p>
+<p>
+Note: this method should never be called directly.
+</p>
+</div>
+<table summary="Method list" cellpadding="5" width="100%">
+<tr><td class="tablesubtitle">Public Instance methods</td></tr>
+</table>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000004"></a>
+<b>pending?</b>()
+</td></tr>
+</table>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000005"></a>
+<a href="Device.src/M000005.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000005.html');return false;">
+<b>next_event</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the next <a href="Event.html">Joystick::Event</a> from a <a
+href="Device.html">Joystick::Device</a> object.
+</p>
+<p>
+Note: For performance reasons, only one joystick event is allocated per
+device. Calling this method will silently overwrite old events for this
+device.
+</p>
+<p>
+This method will block if no data is waiting to be read, so you should
+probably test the <a href="Device.html">Joystick::Device</a> object with
+Joystick::Device#pending? before calling this method.
+</p>
+<p>
+Aliases:
+</p>
+<pre>
+  Joystick::Device::ev
+  Joystick::Device::event
+  Joystick::Device::next_ev
+</pre>
+<p>
+Example:
+</p>
+<pre>
+  ev = joy.next_event
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000006"></a>
+<a href="Device.src/M000006.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000006.html');return false;">
+<b>axes</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the number of axes for this joystick.
+</p>
+<p>
+Note: Don't forget that each joypad has two axes.
+</p>
+<p>
+Aliases:
+</p>
+<pre>
+  Joystick::Device#num_axes
+</pre>
+<p>
+Example:
+</p>
+<pre>
+  puts &quot;This joystick has #{joy.axes / 2} pads.&quot;
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000007"></a>
+<a href="Device.src/M000007.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000007.html');return false;">
+<b>buttons</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the number of buttons for this <a
+href="Device.html">Joystick::Device</a> object.
+</p>
+<p>
+Aliases:
+</p>
+<pre>
+  Joystick::Device#num_buttons
+</pre>
+<p>
+Example:
+</p>
+<pre>
+  puts &quot;This joystick has #{joy.buttons / 2} buttons.&quot;
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000008"></a>
+<a href="Device.src/M000008.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000008.html');return false;">
+<b>name</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the name of this <a href="Device.html">Joystick::Device</a> object.
+</p>
+<p>
+Note: not all joysticks have descriptive names.
+</p>
+<p>
+Example:
+</p>
+<pre>
+  puts &quot;Joystick Name: #{joy.name}&quot;
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000009"></a>
+<a href="Device.src/M000009.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000009.html');return false;">
+<b>fd</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Return the file descriptor of this <a
+href="Device.html">Joystick::Device</a> object.
+</p>
+<p>
+Example:
+</p>
+<pre>
+  fd = joy.fd
+</pre>
+</div>
+<table summary="method"  width="100%" cellspacing="0" cellpadding="5" border="0">
+<tr><td class="methodtitle">
+<a name="M000010"></a>
+<a href="Device.src/M000010.html" target="Code" class="methodtitle"
+ onClick="popCode('Device.src/M000010.html');return false;">
+<b>close</b>(VALUE self)
+</a>
+</td></tr>
+</table>
+<div class="description">
+<p>
+Close a <a href="Device.html">Joystick::Device</a> object.
+</p>
+<p>
+Note: You cannot read or write to a closed joystick device.
+</p>
+<p>
+Example:
+</p>
+<pre>
+  joy.close
+</pre>
+</div>
+
+</body>
+</html>
