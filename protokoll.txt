@@ -1,5 +1,7 @@
 Multitris - Protokoll 1.0
 
+Server und Client kommunizieren durch Befehle, die durch \n terminiert werden.
+
 ======= Server-Befehle ========
 
 CHUCK x
@@ -28,8 +30,9 @@ THATWASMISERABLE
 ======= Client-Befehle =======
 
 Nach Verbindungsaufbau sendet der Client die Nachricht
-IWANTFUN x
-x ist die implementierte Protokollversion (hier 1.0); danach ist der Client in der LogIn-Phase, d.h. er wartet darauf dass ein Spiel gestartet wird. An startenden Spielen nimmt der Client automatisch teil, es ist also keine weitere Aktion erforderlich
+IWANTFUN x y
+x ist die implementierte Protokollversion (hier 1.0), besteht nur aus nicht-Leerzeichen; y ist benutzerdefinierter Name des Spielers (beliebige Zeichen inkl. Leerzeichen, Zeilenumbruch unzulässig).
+Danach ist der Client in der LogIn-Phase, d.h. er wartet darauf dass ein Spiel gestartet wird. An startenden Spielen nimmt der Client automatisch teil, es ist also keine weitere Aktion erforderlich
 
 NORRIS x
 (in jeder Phase) ist die einzig korrekte Antwort auf die "CHUCK x"-Anfrage des Servers; muss innerhalb der Timeout-Zeit gegeben werden
@@ -41,8 +44,8 @@ STOIBER
 (in Action-Phase) Das Tetris-Element des Clients soll eine Spalte nach rechts verschoben werden
 
 TURN
-(in Action-Phase) Das Tetris-Element des Clients soll gegen den Uhrzeigersinn gedreht werden; ein Drehen im Uhrzeigersinn ist nicht mï¿½glich
+(in Action-Phase) Das Tetris-Element des Clients soll gegen den Uhrzeigersinn gedreht werden; ein Drehen im Uhrzeigersinn ist nicht moeglich
 
 
 Fehlerhafte Befehle des Clients werden vom Server stillschweigend ignoriert oder ggf. durch FUCKYOU und Verbindungsabbruch bestraft.
-Die Timeout-Zeit liegt vï¿½llig im Ermessen des Servers. Der Client sollte sich also mit seinen NORRIS-Antworten beeilen.
+Die Timeout-Zeit liegt voellig im Ermessen des Servers. Der Client sollte sich also mit seinen NORRIS-Antworten beeilen.
