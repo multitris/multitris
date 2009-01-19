@@ -39,7 +39,7 @@ Version= "1.0"
 			@connection.each do |line|
 				line.strip!
 				case line
-				when /^CHUCK (/d+)$/ #ping
+				when /^CHUCK (\d+)$/ #ping
 					@connection.print "NORRIS #{$1}\n"
 				when /^FUCKYOU( .+?)$/
 					@connection.close

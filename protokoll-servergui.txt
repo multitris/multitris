@@ -33,7 +33,7 @@ Setzt den "Tetris-Pixel" an der Stelle (row, column) auf die entsprechende Farbe
 Ist "special" gegeben, soll bei der Darstellung des neuen Spielstatus (beim FLUSH-Aufruf) das angegebene Extra angezeigt werden.
 Möglich ist bisher nur der special-Wert "explode": Lass die vorher dort existenten Steine explodieren (normalerweise durch eine volle Reihe ausgelöst).
 Der bloße SET-Befehl erzeugt ohne FLUSH noch keine sichtbare Veränderung der GUI!
-Der "row"-Wert wird in "Ebenen über dem Boden" gemessen (unterste Schicht ist 0, darüber 1, usw.); der "col"-Wert zählt von links nach rechts hoch (die Spalte ganz links hat die Zahl 0, rechts daneben die 1, usw.).
+Der "row"-Wert wird von oben nach unten gemessen (oberste ist 0, darunter 1, usw.); der "col"-Wert zählt von links nach rechts hoch (die Spalte ganz links hat die Zahl 0, rechts daneben die 1, usw.).
 
 FLUSH
 Zeige die zuvor durch SET-Befehle ausgelösten Veränderungen an. Spiele dabei ggf. zuvor angegebene Extras ab.
