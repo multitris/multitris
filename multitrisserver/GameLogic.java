@@ -229,7 +229,13 @@ public class GameLogic
 		// check gameOver
 		boolean gameOver = false;
 		for(int col=0;col<this.width;col++)
-			gameOver = gameOver || (this.fixedPixels[0][col] != 0);
+		{
+			if(this.fixedPixels[0][col] != 0)
+			{
+				gameOver = true;
+				break;
+			}
+		}
 		
 		if(gameOver)
 			this.gameOver();
@@ -241,7 +247,7 @@ public class GameLogic
 			{
 				Stone tryThisStone = Stone.randomStone();
 				tryThisStone.setY(1-tryThisStone.getHeight());
-				tryThisStone.setX((int)(((double)(this.width-tryThisStone.getWidth()))*Math.random()));
+				tryThisStone.setX((int)(((double)(this.width-tryThisStone.getWidth()+1))*Math.random()));
 				
 				if(this.validTransformation(tryThisStone, tryThisStone)) // call to see whether it fits
 				{
@@ -324,6 +330,7 @@ public class GameLogic
 	{
 		this.stones.add(s);
 		this.fieldObserver.stoneChanged(s, s);
+		this.fieldObserver.flush(this.gui);
 	}
 	
 	public void debug_insertStone(Stone s) // for testing purposes only
