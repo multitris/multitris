@@ -144,7 +144,7 @@ public class GamePanel extends JPanel
 			if(players.get(i).name!="")
 			{
 				g.setColor(players.get(i).color);
-				g.drawString(players.get(i).name, width+5, 20+25*(y++));
+				g.drawString(players.get(i).name+": "+players.get(i).points, width+5, 20+25*(y++));
 			}
 		
 		y=0;

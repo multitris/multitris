@@ -92,11 +92,10 @@ public class Client
                           cs.getInputStream() ) );
                 processRequest(in);
                 cs.close();
-                System.out.println("Server closed connection.");
-                System.exit(0);
+                gp.MESSAGE("Server closed connection.");
         }
         catch( Exception e ){
-             System.err.println( e.toString() );
+             gp.MESSAGE( e.toString() );
         }
     }
 }
