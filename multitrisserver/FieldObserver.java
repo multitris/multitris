@@ -60,6 +60,7 @@ public class FieldObserver
 		{
 			FieldObserverChange change = this.changes.get(0);
 			gui.SET(change.getY(), change.getX(), change.getColor(), change.getExploding());
+			System.out.println("SET " + change.getY() + " " + change.getX() + " " + change.getColor() + (change.getExploding() ? " explode" : "")); // debug
 			this.changes.remove(0);
 		}
 		gui.FLUSH();
