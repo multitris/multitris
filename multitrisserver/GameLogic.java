@@ -8,6 +8,8 @@ public class GameLogic
 	private int height;
 	private int [] [] fixedPixels;
 	// manages all Tetris blocks which cannot be moved any more. Enumerated as described in server/gui-protocoll (first index: row, starting from top to bottom, second index: col, starting from left to right). Contains 0 if there is no permanent block at this position, otherwise it contains the corresponding color id.
+	private FieldObserver fieldObserver; // tell him all changes of the field, and he will be your friend
+	private GUIServer gui;
 	
 	public GameLogic()
 	{
@@ -21,6 +23,13 @@ public class GameLogic
 			for(int col=0;col<this.width;col++)
 				this.fixedPixels[row][col] = 0;
 		}
+		this.fieldObserver = new FieldObserver(this.height, this.width);
+		this.gui = new GUIServer(2345);
+	}
+	
+	public void shutDown()
+	{
+		this.gui.close();
 	}
 	
 	private void debug_printField() // pseudo-gui, for debugging purposes only
@@ -61,45 +70,30 @@ public class GameLogic
 	
 	public boolean tryToMoveLeft(Stone s)
 	{
-		if(s.getX() > 0)
-		{
-			Stone newStone = s.clone();
-			newStone.move(0, -1);
-			if(this.validTransformation(newStone, s))
-			{
-				s.move(0, -1);
-				return true;
-			}
-		}
-		return false;
+		return this.tryToMove(s, 0, -1);
 	}
 	
 	public boolean tryToMoveRight(Stone s)
 	{
-		if(s.getX() + s.getWidth() < this.width)
-		{
-			Stone newStone = s.clone();
-			newStone.move(0, 1);
-			if(this.validTransformation(newStone, s))
-			{
-				s.move(0, 1);
-				return true;
-			}
-		}
-		return false;
+		return this.tryToMove(s, 0, 1);
 	}
 	
 	public boolean tryToMoveDown(Stone s)
 	{
-		if(s.getY() + s.getHeight() < this.height)
+		return this.tryToMove(s, 1, 0);
+	}
+	
+	private boolean tryToMove(Stone s, int deltaY, int deltaX)
+	{
+		Stone newStone = s.clone();
+		newStone.move(deltaY, deltaX);
+		
+		if(this.validTransformation(newStone, s))
 		{
-			Stone newStone = s.clone();
-			newStone.move(1, 0);
-			if(this.validTransformation(newStone, s))
-			{
-				s.move(1, 0);
-				return true;
-			}
+			this.fieldObserver.stoneChanged(newStone, s);
+			s.move(deltaY, deltaX);
+			this.fieldObserver.flush(this.gui);
+			return true;
 		}
 		return false;
 	}
@@ -108,9 +102,12 @@ public class GameLogic
 	{
 		Stone newStone = s.clone();
 		newStone.rotate();
+		
 		if(this.validTransformation(newStone, s))
 		{
+			this.fieldObserver.stoneChanged(newStone, s);
 			s.rotate();
+			this.fieldObserver.flush(this.gui);
 			return true;
 		}
 		return false;
@@ -175,7 +172,12 @@ public class GameLogic
 		// the remaining stones can definitely be moved down. now do so!
 		
 		for(int i=0;i<this.stones.size();i++)
+		{
+			Stone movedStone = this.stones.get(i).clone();
+			movedStone.move(1, 0);
+			this.fieldObserver.stoneChanged(movedStone, this.stones.get(i));
 			this.stones.get(i).move(1, 0);
+		}
 	}
 	
 	public void convertStoneToFixedPixels(Stone s)
@@ -188,11 +190,27 @@ public class GameLogic
 			if(coords[0] > -1 && coords[0] < this.height && coords[1] > -1 && coords[1] < this.width) // except for coords[0] > -1, this should always be the case!
 			{
 				this.fixedPixels[coords[0]][coords[1]] = s.getColor();
+				this.fieldObserver.fixedPixelChanged(coords[0], coords[1], s.getColor(), false);
 			}
 		}
 		
 		// TODO: Tell Stone and player it does not exist any more
 		this.stones.remove(s);
+	}
+	
+	private void gameStep()
+	{
+		this.moveAllDown();
+		this.removeCompletedRows();
+		this.fieldObserver.flush(this.gui);
+		
+		// check gameOver
+		boolean gameOver = false;
+		for(int col=0;col<this.width;col++)
+			gameOver = gameOver || (this.fixedPixels[0][col] != 0);
+		
+		if(gameOver)
+			this.gameOver();
 	}
 	
 	private void removeCompletedRows()
@@ -249,6 +267,15 @@ public class GameLogic
 				if(canRemove)
 				{
 					this.fixedPixels = newFixedPixels;
+					// let's do some ugly stuff :)
+					for(int updateRow=row;updateRow<this.height;updateRow++)
+					{
+						for(int updateCol=0;updateCol<this.width;updateCol++)
+							this.fieldObserver.fixedPixelChanged(updateRow, updateCol, newFixedPixels[updateRow][updateCol], (updateRow==row));
+					}
+					for(int i=0;i<this.stones.size();i++)
+						this.fieldObserver.stoneChanged(this.stones.get(i), this.stones.get(i)); // yes he HAS changed! I'm totally sure! ;)
+					
 					row++; // re-check current row
 				}
 			}
@@ -258,6 +285,12 @@ public class GameLogic
 	public void debug_insertStone(Stone s) // for testing purposes only. will probably be turned into a private method
 	{
 		this.stones.add(s);
+		this.fieldObserver.stoneChanged(s, s);
+	}
+	
+	private void gameOver()
+	{
+		this.gui.MESSAGE("Ohhhh you lost");
 	}
 	
 	public static void main(String[] args)
@@ -331,5 +364,7 @@ public class GameLogic
 				Thread.sleep(1000);
 			}
 		} catch(Exception e) {System.out.println(e);}
+		
+		GL.shutDown();
 	}
 }
