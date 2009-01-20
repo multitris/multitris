@@ -25,9 +25,9 @@ PORT=12345
 WIDTH= 64
 HEIGHT= 64
 COLORS= 64
-STONES= 10
-SPEED= 10
-TIME= 0.1
+STONES= 2
+SPEED= 50
+TIME= 0.01
 
 require 'socket'
 
@@ -38,7 +38,7 @@ socket.puts "SIZE #{HEIGHT} #{WIDTH}"
 COLORS.times do |i|
 	color= (rand*16777216).floor.to_s(16)
 	color= "0"*(6-color.size) + color
-	socket.puts "COLOR #{i} #{color}"
+	socket.puts "COLOR #{i+1} #{color}"
 end
 
 blocks= []
@@ -46,16 +46,16 @@ blocks= []
 last= Time.now
 
 while true
-	blocks= blocks.collect do |block|
+	blocks= blocks.delete_if do |block|
 		block.count-= 1
-		next unless block.count == 0
+		next false unless block.count == 0
 		block.count= block.speed
 		socket.puts "SET #{block.y} #{block.x} 0"
 		block.y+= 1
-		next nil if block.y == HEIGHT
+		next true if block.y == HEIGHT
 		socket.puts "SET #{block.y} #{block.x} #{block.color}"
-		block
-	end.delete_if { |x| !x }
+		next false
+	end
 	(rand*STONES).ceil.times do |i|
 		x= (rand*WIDTH).floor
 		color= (rand*COLORS).ceil
@@ -64,6 +64,7 @@ while true
 		socket.puts "SET 0 #{x} #{color}"
 	end
 	socket.puts "FLUSH"
+	puts blocks.size
 	sleep Time.now-last+TIME
 	last= Time.now
 end
