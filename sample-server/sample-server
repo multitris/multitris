@@ -45,10 +45,12 @@ blocks= []
 
 last= Time.now
 
+points= 0
+
 socket.puts "PLAYER 1 superman"
 socket.puts "PLAYER 2 mario"
 socket.puts "POINTS 1 0"
-SOCKET.PUts "POINTS 1 42"
+socket.puts "POINTS 1 42"
 socket.puts "MESSAGE Game starts"
 socket.puts "MESSAGE Who will win?"
 
