@@ -32,7 +32,15 @@ public class Client
         	   if(command.equals("PLAYER"))
 	           {
 	        	   int n=Integer.parseInt(first.split(" ", 3)[1]);
-	        	   String p = first.split(" ", 3)[2];
+	        	   String p="";
+	        	   try
+	        	   {
+	        		   p = first.split(" ", 3)[2];
+	        	   }
+	        	   catch(ArrayIndexOutOfBoundsException e)
+	        	   {
+	        		   //do nothing... p is already "" and gp.PLAYER() can handle this....
+	        	   }
 	        	   gp.PLAYER(n, p);
 	           }
         	   if(command.equals("AUTH"))
