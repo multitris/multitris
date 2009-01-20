@@ -8,26 +8,24 @@ public class Stone
 	private int numberOfPixels = 0; // is computed the first time numberOfPixels() is called
 	private int color = 1;
 	
-	public Stone(int type) // we might want to remove that constructor later
+	public static Stone randomStone()
 	{
-		switch(type)
+		int randType = (int)(7.0 * Math.random());
+		
+		boolean[][] matrix;
+		
+		switch(randType)
 		{
-			case 0:
-			{
-				matrix = new boolean[][]{{true,true,true,true}};
-				break;
-			}
-			case 1:
-			{
-				matrix = new boolean[] [] {{true, true},{true,true}};
-				break;
-			}
-			case 2:
-			{
-				matrix = new boolean[] [] {{true,true,true},{false,true,false}};
-				break;
-			}
+			case 0:	matrix = new boolean[][] {{false,true,true},{true,true,false}}; break;
+			case 1:	matrix = new boolean[][] {{false,true},{false,true},{true,true}}; break;
+			case 2:	matrix = new boolean[][] {{true,true},{true,true}}; break;
+			case 3:	matrix = new boolean[][] {{true,true,false},{false,true,true}}; break;
+			case 4:	matrix = new boolean[][] {{true,true},{false,true},{false,true}}; break;
+			case 5:	matrix = new boolean[][] {{false,true,false},{true,true,true}}; break;
+			default:	matrix = new boolean[][] {{true,true,true,true}}; break;
 		}
+		
+		return new Stone(matrix);
 	}
 	
 	public Stone(boolean[][] matrix)

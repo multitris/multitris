@@ -14,8 +14,8 @@ public class GameLogic
 	public GameLogic()
 	{
 		this.stones = new LinkedList<Stone>();
-		this.width = 12; // debug value, should be bigger
-		this.height = 6; // debug value, should be bigger
+		this.width = 20; // debug value, should be bigger
+		this.height = 10; // debug value, should be bigger
 		this.fixedPixels = new int[this.height][];
 		for(int row=0;row<this.height;row++)
 		{
@@ -211,6 +211,22 @@ public class GameLogic
 		
 		if(gameOver)
 			this.gameOver();
+		else
+		{
+			// new stone?
+			
+			if(Math.random() < 0.25)
+			{
+				Stone tryThisStone = Stone.randomStone();
+				tryThisStone.setY(1-tryThisStone.getHeight());
+				tryThisStone.setX((int)(((double)(this.width-tryThisStone.getWidth()))*Math.random()));
+				
+				if(this.validTransformation(tryThisStone, tryThisStone)) // call to see whether it fits
+				{
+					this.insertStone(tryThisStone);
+				}
+			}
+		}
 	}
 	
 	private void removeCompletedRows()
@@ -282,15 +298,20 @@ public class GameLogic
 		}
 	}
 	
-	public void debug_insertStone(Stone s) // for testing purposes only. will probably be turned into a private method
+	private void insertStone(Stone s)
 	{
 		this.stones.add(s);
 		this.fieldObserver.stoneChanged(s, s);
 	}
 	
+	public void debug_insertStone(Stone s) // for testing purposes only
+	{
+		this.insertStone(s);
+	}
+	
 	private void gameOver()
 	{
-		this.gui.MESSAGE("Ohhhh you lost");
+		this.gui.MESSAGE("Ohhhh you lost"); // TODO: stop the game ;)
 	}
 	
 	public static void main(String[] args)
@@ -298,7 +319,7 @@ public class GameLogic
 		GameLogic GL = new GameLogic();
 		
 		GL.debug_printField();
-		boolean[][] matrix = new boolean[][] {{true,true,true},{false,true,false}};
+		/*boolean[][] matrix = new boolean[][] {{true,true,true},{false,true,false}};
 		Stone s = new Stone(matrix);
 		s.setX(2);
 		s.setY(1);
@@ -353,13 +374,12 @@ public class GameLogic
 			balken.setY(3-(i/3));
 			
 			GL.debug_insertStone(balken);
-		}
+		} */
 		
 		try {
-			for(int i=0;i<15;i++)
+			for(int i=0;i<60;i++)
 			{
-				GL.moveAllDown();
-				GL.removeCompletedRows();
+				GL.gameStep();
 				GL.debug_printField();
 				Thread.sleep(1000);
 			}
