@@ -22,7 +22,7 @@ public class Client
            String first;
            while((first=in.readLine())!=null)
            {
-        	   System.out.println("GOt:"+first);
+        	   System.out.println("Got:"+first);
         	   
         	   String command = first.split(" ", 3)[0];
 	           if(command.equals("AUTH"))
@@ -78,6 +78,8 @@ public class Client
                           cs.getInputStream() ) );
                 processRequest(in);
                 cs.close();
+                System.out.println("Server closed connection.");
+                System.exit(0);
         }
         catch( Exception e ){
              System.err.println( e.toString() );

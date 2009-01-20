@@ -20,10 +20,18 @@ public class GamePanel extends JPanel
 	private String[] messages;
 	private Color convertColor(String hexcolor)
 	{
-		int r = Integer.parseInt(hexcolor.substring(0, 2), 16);
-		int g = Integer.parseInt(hexcolor.substring(2, 4), 16);
-		int b = Integer.parseInt(hexcolor.substring(4, 6), 16);
-		return new Color(r,g,b);
+		try
+		{
+			int r = Integer.parseInt(hexcolor.substring(0, 2), 16);
+			int g = Integer.parseInt(hexcolor.substring(2, 4), 16);
+			int b = Integer.parseInt(hexcolor.substring(4, 6), 16);
+			return new Color(r,g,b);
+		}
+		catch (Exception e)
+		{
+			System.err.println("Der idiot kann keine farben... wir machen schwarz.,");
+			return new Color(0,0,0);
+		}
 	}
 	public void RESET(boolean field, boolean players, boolean colors, boolean points, boolean messages)
 	{
@@ -115,11 +123,12 @@ public class GamePanel extends JPanel
 		pixmatrix = new Color [vwidth] [vheight];
 		players=new LinkedList<Player>();
 		messages=new String[MAXMESSAGES];
+		COLOR(0, "FFFFFF");
 	}
 	public void paint(Graphics g)
+	
 	{
 		g.clearRect(0, 0, wwidth, wheight);
-		
 		for (int x=0;x<pixmatrix.length;x++)
 			for (int y=0;y<pixmatrix.length;y++)
 			{

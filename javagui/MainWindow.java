@@ -35,12 +35,13 @@ public class MainWindow extends JFrame
 	{
 		GamePanel gp = new GamePanel();
 		MainWindow MW = new MainWindow(gp);
-		Client s = new Client(gp, "localhost", 6000);
+		Client s = new Client(gp, "localhost", 12345);
 		s.loop();
 		gp.SIZE(20,20);
 		gp.COLOR(1, "0000ff");
 		gp.COLOR(2, "ff0000");
 		gp.COLOR(3, "00FF00");
+		gp.MESSAGE("No Server found... starting Demo....");
 		gp.FLUSH();
 		delay(2000);
 		gp.PLAYER(3, "Peter");
@@ -63,7 +64,7 @@ public class MainWindow extends JFrame
 		{
 			for (int x=0;x<20;x++)
 				for(int y=0;y<20;y++)
-					gp.SET(x, y, rnd(1,3));
+					gp.SET(x, y, rnd(0,3));
 			gp.FLUSH();
 			delay(100);
 		}
