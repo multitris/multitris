@@ -123,12 +123,12 @@ public class GamePanel extends JPanel
 		pixmatrix = new Color [vwidth] [vheight];
 		players=new LinkedList<Player>();
 		messages=new String[MAXMESSAGES];
-		COLOR(0, "FFFFFF");
+		COLOR(0, "000000");
 	}
 	public void paint(Graphics g)
-	
 	{
-		g.clearRect(0, 0, wwidth, wheight);
+		g.setColor(new Color(0,0,0));
+		g.fillRect(0, 0, wwidth, wheight);
 		for (int x=0;x<pixmatrix.length;x++)
 			for (int y=0;y<pixmatrix.length;y++)
 			{
@@ -148,7 +148,7 @@ public class GamePanel extends JPanel
 			}
 		
 		y=0;
-		g.setColor(new Color(0,0,0));
+		g.setColor(new Color(255,255,255));
 		for (int i=0;i<MAXMESSAGES;i++)
 			if (messages[i]!=null)
 				g.drawString(messages[i], 5, height+10+25*(y++));
