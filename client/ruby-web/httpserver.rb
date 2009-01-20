@@ -20,8 +20,8 @@
 # along with sendhttp.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-require 'sendhttp-lib/io2io'
-require 'sendhttp-lib/magicmime'
+require 'io2io'
+require 'magicmime'
 require 'socket'
 
 # A small but not complete http server.
@@ -37,7 +37,8 @@ require 'socket'
 # * access control
 class HTTPServer
 
-	def initialize
+	def initialize(servername)
+		@servername= servername
 		#@files= [] FIXME I don't remember what this was for
 	end
 
@@ -84,8 +85,11 @@ class HTTPServer
 		if (if connection.readline.strip=~ /^(GET|POST) \/(.*?) HTTP\/1.[01]$/
 			filename= $2
 			vars= HTTPServer.read_vars(connection)
-			if vars["Content-Type"]=~ /^multipart\/form-data;\s+boundary=(.+?)$/
+			case vars["Content-Type"]
+			when /^multipart\/form-data;\s+boundary=(.+?)$/
 				vars["form-data"]= HTTPServer.read_multipart(connection, "--#{$1}")
+			when "application/x-www-form-urlencoded"
+				vars["form-data"]= HTTPServer.read_postdata(connection, vars["Content-Length"].to_i)
 			end
 			true
 		end) and stream= block.call(filename, vars)
@@ -94,7 +98,7 @@ class HTTPServer
 			vars= ((stream.size == 2 and stream.pop) or Hash.new)
 			stream= stream[0]
 			connection.puts "HTTP/1.1 #{status}"
-			connection.puts HTTPServer.header.collect { |name, value| "#{name}: #{value}" }
+			connection.puts header.collect { |name, value| "#{name}: #{value}" }
 			connection.puts vars.collect { |name, value| "#{name}: #{value}" }
 			connection.puts "Connection: close"
 			connection.puts
@@ -116,10 +120,10 @@ class HTTPServer
 	end
 
 	# Returns the default http headers as a Hash.
-	def HTTPServer.header
+	def header
 		result= Hash.new
 		result["Date"]= "Date: #{Time.now.gmtime.strftime("%a, %d %b %Y %H:%M:%S GMT")}"
-		result["Server"]= "sendhttp/#{$version}"
+		result["Server"]= @servername
 		return result
 	end
 
@@ -166,6 +170,15 @@ class HTTPServer
 			else
 				tmp, the_end= find_boundary(stream, boundary)
 			end
+		end
+		result
+	end
+
+	def HTTPServer.read_postdata(stream, size)
+		result= Hash.new
+		stream.read(size)=~ /^/
+		while $'=~ /^([^=&]+)=([^=&]+)(&|$)/
+			result[$1]= $2
 		end
 		result
 	end
