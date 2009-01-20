@@ -1,0 +1,35 @@
+public class GameLogic
+{
+	private LinkedList<Stone> stones;
+	private int width;
+	private int height;
+	private int [] [] fixedPixels;
+	
+	public void startGame();
+	private void moveAllDown(); // moves all stones at the same time; cannot be done by calling tryToMoveDown for each stone!
+	private void gameStep(); // moves all down, removes complete rows, maybe creates new stone, maybe calls gameOver
+	private void removeCompletedRows(); // removes all completed rows. that's more difficult than it sounds: rows must not be removed if the removal would create an invalid situation, e.g. stones overlapping fixed pixels
+	private void convertStoneToFixedPixels(Stone s); // converts stone to fixed pixels and removes s out of stones list
+	
+	public boolean tryToMoveLeft(Stone s);
+	public boolean tryToMoveRight(Stone s);
+	public boolean tryToMoveDown(Stone s);
+	public boolean tryToRotate(Stone s);
+
+	private boolean validTransformation(Stone newStone, Stone oldStone);
+	private void gameOver();
+}
+
+public class Stone
+{
+	private int x;
+	private int y;
+	public boolean [] [] matrix;
+
+	public Stone clone();
+	public void rotate(); // resulting Stone is not checked; might be out of range or colliding with other Stone
+	public void move(int deltaX, int deltaY); // resulting Stone is not checked; might be out of range or colliding with other Stone
+	public boolean collidesWith(Stone b);
+	public boolean collidesWith(int [][] fixedPixels);
+}
+
