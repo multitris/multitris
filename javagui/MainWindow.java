@@ -5,7 +5,7 @@ import java.util.Random;
 import java.awt.Dimension;
 import java.awt.event.*;
 
-public class MainWindow extends JFrame implements WindowStateListener
+public class MainWindow extends JFrame
 {
 	private GamePanel gp;
 	public MainWindow(GamePanel gp)
@@ -15,7 +15,6 @@ public class MainWindow extends JFrame implements WindowStateListener
 		this.setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.gp=gp;
-		this.addWindowStateListener(this);
 	}
 	public static int rnd(int min, int max)
 	{
@@ -39,18 +38,19 @@ public class MainWindow extends JFrame implements WindowStateListener
 	}
 	public static void demo(GamePanel gp)
 	{
-		gp.SIZE(20,20);
-		gp.COLOR(1, "0000ff");
-		gp.COLOR(2, "ff0000");
-		gp.COLOR(3, "00FF00");
+		gp.SIZE(100,100);
+		gp.COLOR(1, "ff0000");
+		gp.COLOR(2, "00ff00");
+		gp.COLOR(3, "0000ff");
 		gp.FLUSH();
 		delay(2000);
-		gp.PLAYER(3, "Peter");
+		gp.COLOR(4, "000000");
+		gp.PLAYER(4, "Peter");
 		gp.MESSAGE("Peter joined the Game");
 		gp.FLUSH();
 		delay(2000);
-		gp.PLAYER(4, "Parker");
-		gp.COLOR(4, "aa0037");
+		gp.PLAYER(5, "Parker");
+		gp.COLOR(5, "aa0037");
 		gp.MESSAGE("Parker joined the Game");
 		gp.FLUSH();
 		delay(2000);
@@ -63,26 +63,33 @@ public class MainWindow extends JFrame implements WindowStateListener
 		delay(1000);
 		for (int i=0;i<30;i++)
 		{
-			for (int x=0;x<20;x++)
-				for(int y=0;y<20;y++)
-					gp.SET(x, y, rnd(0,3));
+			for (int x=0;x<100;x++)
+				for(int y=0;y<100;y++)
+					gp.SET(x, y, rnd(0,5));
 			gp.FLUSH();
 			delay(100);
 		}
 		gp.MESSAGE("Fertig");
 		gp.FLUSH();
-	
+		gp.RESET(true, false, false, false, false);
+		for (int x=0;x<100;x+=3)
+		{
+				int end = ((x%2)==0)?100:-1;
+				int pm = ((x%2)==0)?1:-1;
+				for(int y=((x%2)==0)?0:99;y!=end;y+=pm)
+				{
+					gp.SET(y, x, 1);
+					gp.FLUSH();
+					delay(10);
+				}
+		}
 	}
 	public static void main(String[] args)
 	{
 		GamePanel gp = new GamePanel();
 		MainWindow MW = new MainWindow(gp);
-		Client s = new Client(gp, "localhost", 12345);
-		s.loop();
+		Client c = new Client(gp, "localhost", 12345);
+		c.loop();
 		demo(gp);
-	}
-	public void windowStateChanged(WindowEvent e) {
-		// TODO Auto-generated method stub
-		//Dimension d=this.getSize();
 	}
 }

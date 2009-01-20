@@ -65,7 +65,10 @@ public class Client
 	           }
 	           if(command.equals("RESET"))
 	           {
-	        	   gp.RESET(
+	        	   if (first.equals("RESET"))
+	        		   gp.RESET(true,true,true,true,true);
+	        	   else
+	        		   gp.RESET(
 	        			   first.contains("FIELD"),
 	        			   first.contains("PLAYERS"),
 	        			   first.contains("COLORS"),
