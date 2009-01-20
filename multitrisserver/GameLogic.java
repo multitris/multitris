@@ -24,7 +24,7 @@ public class GameLogic
 				this.fixedPixels[row][col] = 0;
 		}
 		this.fieldObserver = new FieldObserver(this.height, this.width);
-		this.gui = new GUIServer(2345);
+		this.gui = new GUIServer(12345);
 	}
 	
 	public void shutDown()

@@ -82,12 +82,17 @@ public class GUIServer implements Runnable
 		{
 			try
 			{
+				sSock.setSoTimeout(1000);
 				Socket clientSocket=sSock.accept();//wait for a client to connect
 				System.out.println("New Client connected");
 	            OutputStreamWriter out
 	               = new OutputStreamWriter(
 	                    clientSocket.getOutputStream() );
 	            clients.add(out);
+			}
+			catch (SocketTimeoutException e)
+			{
+				//do nothing
 			}
 			catch (Exception e)
 			{
