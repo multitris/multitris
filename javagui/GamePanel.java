@@ -1,4 +1,5 @@
 package javagui;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 import java.util.LinkedList;
@@ -18,6 +19,20 @@ public class GamePanel extends JPanel
 	private Color [][] pixmatrix;
 	private LinkedList<Player> players;
 	private String[] messages;
+	public void autoresize()
+	{
+		Dimension d = this.getSize();
+		wwidth=d.width;
+		wheight=d.height;
+		width = wwidth-nwidth;
+		height = wheight-mheight;
+		FLUSH();
+	}
+	public void doLayout()
+	{
+		super.doLayout();
+		this.autoresize();
+	}
 	private Color convertColor(String hexcolor)
 	{
 		try

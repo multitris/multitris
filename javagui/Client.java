@@ -83,7 +83,8 @@ public class Client
         }
     }
     public void loop(){
-        try
+        gp.MESSAGE("Trying to connect...");
+    	try
         {
         	Socket cs = new Socket(url, port);
             BufferedReader in
@@ -94,6 +95,10 @@ public class Client
                 cs.close();
                 gp.MESSAGE("Server closed connection.");
         }
+    	catch(ConnectException e)
+    	{
+    		gp.MESSAGE("Server not found... startig Demo");
+    	}
         catch( Exception e ){
              gp.MESSAGE( e.toString() );
         }
