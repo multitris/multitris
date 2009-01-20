@@ -27,7 +27,8 @@ HEIGHT= 64
 COLORS= 64
 STONES= 2
 SPEED= 5
-TIME= 0.2
+TIME= 0.1
+STEPS= 200
 
 require 'socket'
 
@@ -35,26 +36,67 @@ Block= Struct.new(:x, :y, :color, :speed, :count)
 
 socket= TCPServer.new(PORT).accept
 socket.puts "SIZE #{HEIGHT} #{WIDTH}"
+
+socket.puts "COLOR 1 ff0000"
+
+last= Time.now
+x= 0
+y= -1
+((WIDTH < HEIGHT ? WIDTH : HEIGHT)/2).times do |ii|
+	socket.puts "MESSAGE round #{ii+1}"
+	(HEIGHT-4*ii).times do |i|
+		y+= 1
+		socket.puts "SET #{y} #{x} 1"
+		socket.puts "FLUSH"
+		sleep Time.now-last+(TIME/10)
+		last= Time.now
+	end
+	(WIDTH-4*ii-1).times do |i|
+		x+= 1
+		socket.puts "SET #{y} #{x} 1"
+		socket.puts "FLUSH"
+		sleep Time.now-last+(TIME/10)
+		last= Time.now
+	end
+	(HEIGHT-4*ii-2).times do |i|
+		y-= 1
+		socket.puts "SET #{y} #{x} 1"
+		socket.puts "FLUSH"
+		sleep Time.now-last+(TIME/10)
+		last= Time.now
+	end
+	(WIDTH-4*ii-3).times do |i|
+		x-= 1
+		socket.puts "SET #{y} #{x} 1"
+		socket.puts "FLUSH"
+		sleep Time.now-last+(TIME/10)
+		last= Time.now
+	end
+end
+
+sleep 2
+
+socket.puts "RESET"
+
 COLORS.times do |i|
 	color= (rand*16777216).floor.to_s(16)
 	color= "0"*(6-color.size) + color
 	socket.puts "COLOR #{i+1} #{color}"
 end
 
-blocks= []
+
+
+socket.puts "PLAYER 1 neo"
+socket.puts "PLAYER 2 smith"
+socket.puts "POINTS 1 42"
+socket.puts "POINTS 1 23"
+socket.puts "MESSAGE the Matrix has you neo"
 
 last= Time.now
-
 points= 0
-
-socket.puts "PLAYER 1 superman"
-socket.puts "PLAYER 2 mario"
-socket.puts "POINTS 1 0"
-socket.puts "POINTS 1 42"
-socket.puts "MESSAGE Game starts"
-socket.puts "MESSAGE Who will win?"
-
-while true
+blocks= []
+blocks << Block.new(0, HEIGHT-1, 0, 0, 1)
+while blocks.size > 0
 	blocks= blocks.delete_if do |block|
 		block.count-= 1
 		next false unless block.count == 0
@@ -71,10 +113,9 @@ while true
 		speed= (rand*SPEED).ceil
 		blocks << Block.new(x, 0, color, speed, speed)
 		socket.puts "SET 0 #{x} #{color}"
-	end
+	end if points < STEPS
 	socket.puts "FLUSH"
 	socket.puts "POINTS 1 #{points+= 1}"
-	puts blocks.size
 	sleep Time.now-last+TIME
 	last= Time.now
 end
