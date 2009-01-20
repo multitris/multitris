@@ -1,0 +1,81 @@
+#!/usr/bin/ruby
+#
+# Author:: Johannes Krude
+# Copyright:: (c) Johannes Krude 2008
+# License:: AGPL3
+#
+#--
+# This file is part of multitris.
+#
+# multitris is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multitris is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with multitris.  If not, see <http://www.gnu.org/licenses/>.
+#++
+
+PORT=12345
+WIDTH= 64
+HEIGHT= 64
+COLORS= 64
+STONES= 2
+SPEED= 5
+TIME= 0.2
+
+require 'socket'
+
+Block= Struct.new(:x, :y, :color, :speed, :count)
+
+socket= TCPServer.new(PORT).accept
+socket.puts "SIZE #{HEIGHT} #{WIDTH}"
+COLORS.times do |i|
+	color= (rand*16777216).floor.to_s(16)
+	color= "0"*(6-color.size) + color
+	socket.puts "COLOR #{i+1} #{color}"
+end
+
+blocks= []
+
+last= Time.now
+
+points= 0
+
+socket.puts "PLAYER 1 superman"
+socket.puts "PLAYER 2 mario"
+socket.puts "POINTS 1 0"
+socket.puts "POINTS 1 42"
+socket.puts "MESSAGE Game starts"
+socket.puts "MESSAGE Who will win?"
+
+while true
+	blocks= blocks.delete_if do |block|
+		block.count-= 1
+		next false unless block.count == 0
+		block.count= block.speed
+		socket.puts "SET #{block.y} #{block.x} 0"
+		block.y+= 1
+		next true if block.y == HEIGHT
+		socket.puts "SET #{block.y} #{block.x} #{block.color}"
+		next false
+	end
+	(rand*STONES).ceil.times do |i|
+		x= (rand*WIDTH).floor
+		color= (rand*COLORS).ceil
+		speed= (rand*SPEED).ceil
+		blocks << Block.new(x, 0, color, speed, speed)
+		socket.puts "SET 0 #{x} #{color}"
+	end
+	socket.puts "FLUSH"
+	socket.puts "POINTS 1 #{points+= 1}"
+	puts blocks.size
+	sleep Time.now-last+TIME
+	last= Time.now
+end
+
