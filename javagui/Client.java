@@ -37,6 +37,8 @@ public class Client
 	           if(command.equals("COLOR"))
 	           {
 	        	   int player = Integer.parseInt(first.split(" ", 3)[1]);
+	        	   if (player==0)
+	        		   continue;
 	        	   String color = first.split(" ", 3)[2];
 	        	   gp.COLOR(player, color);
 	           }
