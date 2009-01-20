@@ -10,12 +10,19 @@ public class GameLogic
 	// manages all Tetris blocks which cannot be moved any more. Enumerated as described in server/gui-protocoll (first index: row, starting from top to bottom, second index: col, starting from left to right). Contains 0 if there is no permanent block at this position, otherwise it contains the corresponding color id.
 	private FieldObserver fieldObserver; // tell him all changes of the field, and he will be your friend
 	private GUIServer gui;
+	private boolean goOnPlaying=true;
 	
 	public GameLogic()
 	{
 		this.stones = new LinkedList<Stone>();
 		this.width = 20; // debug value, should be bigger
 		this.height = 10; // debug value, should be bigger
+		
+		this.gui = new GUIServer(12345);
+	}
+	
+	public void startGame()
+	{
 		this.fixedPixels = new int[this.height][];
 		for(int row=0;row<this.height;row++)
 		{
@@ -24,11 +31,26 @@ public class GameLogic
 				this.fixedPixels[row][col] = 0;
 		}
 		this.fieldObserver = new FieldObserver(this.height, this.width);
-		this.gui = new GUIServer(12345);
+		
+		this.gui.AUTH("foobar");
+		this.gui.SIZE(this.width, this.height);
+		this.gui.RESET(true, true, true, true, true);
+		
+		this.gui.COLOR(1, "ff0000"); // TODO: user, player, points stuff
+		
+		try {
+			while(this.goOnPlaying)
+			{
+				this.gameStep();
+				this.debug_printField();
+				Thread.sleep(1000);
+			}
+		} catch(Exception e) {System.out.println(e);}
 	}
 	
 	public void shutDown()
 	{
+		this.goOnPlaying = false;
 		this.gui.close();
 	}
 	
@@ -311,14 +333,16 @@ public class GameLogic
 	
 	private void gameOver()
 	{
-		this.gui.MESSAGE("Ohhhh you lost"); // TODO: stop the game ;)
+		this.gui.MESSAGE("Ohhhh you lost");
+		this.goOnPlaying = false; // stop the game
 	}
 	
 	public static void main(String[] args)
 	{
+		System.out.println("Connect your GUI, please :)");
+
 		GameLogic GL = new GameLogic();
 		
-		GL.debug_printField();
 		/*boolean[][] matrix = new boolean[][] {{true,true,true},{false,true,false}};
 		Stone s = new Stone(matrix);
 		s.setX(2);
@@ -376,15 +400,7 @@ public class GameLogic
 			GL.debug_insertStone(balken);
 		} */
 		
-		try {
-			for(int i=0;i<60;i++)
-			{
-				GL.gameStep();
-				GL.debug_printField();
-				Thread.sleep(1000);
-			}
-		} catch(Exception e) {System.out.println(e);}
-		
+		GL.startGame();		
 		GL.shutDown();
 	}
 }
