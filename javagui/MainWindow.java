@@ -35,6 +35,8 @@ public class MainWindow extends JFrame
 	{
 		GamePanel gp = new GamePanel();
 		MainWindow MW = new MainWindow(gp);
+		Client s = new Client(gp, "localhost", 6000);
+		s.loop();
 		gp.SIZE(20,20);
 		gp.COLOR(1, "0000ff");
 		gp.COLOR(2, "ff0000");

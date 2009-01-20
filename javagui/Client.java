@@ -5,7 +5,6 @@ import java.util.*;
 
 public class Client 
 {
-	private boolean keepRunning=true;
 	private GamePanel gp;
 	private String url;
 	private int port;
@@ -23,8 +22,29 @@ public class Client
            String first;
            while((first=in.readLine())!=null)
            {
+        	   System.out.println("GOt:"+first);
+        	   
         	   String command = first.split(" ", 3)[0];
-	           if(command.equals("SIZE"))
+	           if(command.equals("AUTH"))
+	        	   gp.AUTH(first.split(" ", 2)[1]);
+	           if(command.equals("SET"))
+	           {
+	        	   String[] s = first.split(" ", 4);
+	        	   gp.SET(Integer.parseInt(s[1]), Integer.parseInt(s[2]), Integer.parseInt(s[3]));
+	           }
+	           if(command.equals("FLUSH"))
+	        	   gp.FLUSH();
+	           if(command.equals("COLOR"))
+	           {
+	        	   int player = Integer.parseInt(first.split(" ", 3)[1]);
+	        	   String color = first.split(" ", 3)[2];
+	        	   gp.COLOR(player, color);
+	           }
+        	   if(command.equals("MESSAGE"))
+	           {
+	        	   gp.MESSAGE(first.split(" ", 2)[1]);
+	           }
+        	   if(command.equals("SIZE"))
 	           {
 	        	   int w = Integer.parseInt(first.split(" ", 3)[1]);
 	        	   int h = Integer.parseInt(first.split(" ", 3)[2]);
@@ -33,7 +53,13 @@ public class Client
 	           }
 	           if(command.equals("RESET"))
 	           {
-	        	   //to be continued.... 
+	        	   gp.RESET(
+	        			   first.contains("FIELD"),
+	        			   first.contains("PLAYERS"),
+	        			   first.contains("COLORS"),
+	        			   first.contains("POINTS"),
+	        			   first.contains("MESSAGES")
+	        			   );
 	           }
            }
         }

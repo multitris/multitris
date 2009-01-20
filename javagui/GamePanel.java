@@ -16,7 +16,6 @@ public class GamePanel extends JPanel
 	private int vwidth = 1;
 	private int vheight = 1;
 	private Color [][] pixmatrix;
-	private String authstring;
 	private LinkedList<Player> players;
 	private String[] messages;
 	private Color convertColor(String hexcolor)
