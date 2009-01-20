@@ -25,7 +25,19 @@ public class Client
         	   System.out.println("Got:"+first);
         	   
         	   String command = first.split(" ", 3)[0];
-	           if(command.equals("AUTH"))
+	           if(command.equals("POINTS"))
+	           {
+	        	   int n=Integer.parseInt(first.split(" ", 3)[1]);
+	        	   int p=Integer.parseInt(first.split(" ", 3)[2]);
+	        	   gp.POINTS(n,p);
+	           }
+        	   if(command.equals("PLAYER"))
+	           {
+	        	   int n=Integer.parseInt(first.split(" ", 3)[1]);
+	        	   String p = first.split(" ", 3)[2];
+	        	   gp.PLAYER(n, p);
+	           }
+        	   if(command.equals("AUTH"))
 	        	   gp.AUTH(first.split(" ", 2)[1]);
 	           if(command.equals("SET"))
 	           {
