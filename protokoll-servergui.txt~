@@ -31,7 +31,7 @@ SET row column color[ special]
 row, column, color sind Integer, das optionale special-Argument ein beliebiger String ohne Newline.
 Setzt den "Tetris-Pixel" an der Stelle (row, column) auf die entsprechende Farbe. color=0 bedeutet, dass dort kein Tetrix-Block existiert.
 Ist "special" gegeben, soll bei der Darstellung des neuen Spielstatus (beim FLUSH-Aufruf) das angegebene Extra angezeigt werden.
-Möglich ist bisher nur der special-Wert "EXPLODE": Lass die vorher dort existenten Steine explodieren (normalerweise durch eine volle Reihe ausgelöst).
+Möglich ist bisher nur der special-Wert "explode": Lass die vorher dort existenten Steine explodieren (normalerweise durch eine volle Reihe ausgelöst).
 Der bloße SET-Befehl erzeugt ohne FLUSH noch keine sichtbare Veränderung der GUI!
 Der "row"-Wert wird von oben nach unten gemessen (oberste ist 0, darunter 1, usw.); der "col"-Wert zählt von links nach rechts hoch (die Spalte ganz links hat die Zahl 0, rechts daneben die 1, usw.).
 

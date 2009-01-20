@@ -86,7 +86,7 @@ public class GamePanel extends JPanel
 		vwidth=w;
 		vheight=h;
 		pixmatrix = new Color[w][h];
-		repaint();
+		autoresize();
 	}
 	public void COLOR(int player, String color)
 	{
@@ -112,7 +112,7 @@ public class GamePanel extends JPanel
 		}
 		players.add(new Player(n, name));
 	}
-	public void SET(int row, int column, int color)
+	public void SET(int column, int row, int color, String effect)
 	{
 		if (color==0)
 		{
@@ -156,8 +156,8 @@ public class GamePanel extends JPanel
 	{
 		g.setColor(bgcolor);
 		g.fillRect(0, 0, wwidth, wheight);
-		for (int x=0;x<pixmatrix.length;x++)
-			for (int y=0;y<pixmatrix.length;y++)
+		for (int x=0;x<vwidth;x++)
+			for (int y=0;y<vheight;y++)
 			{
 				if (pixmatrix[x][y]!=null)
 				{

@@ -32,15 +32,31 @@ public class Client
         	   if(command.equals("PLAYER"))
 	           {
 	        	   int n=Integer.parseInt(first.split(" ", 3)[1]);
-	        	   String p = first.split(" ", 3)[2];
+	        	   String p="";
+	        	   try
+	        	   {
+	        		   p = first.split(" ", 3)[2];
+	        	   }
+	        	   catch(ArrayIndexOutOfBoundsException e)
+	        	   {
+	        		   //do nothing... p is already "" and gp.PLAYER() can handle this....
+	        	   }
 	        	   gp.PLAYER(n, p);
 	           }
         	   if(command.equals("AUTH"))
 	        	   gp.AUTH(first.split(" ", 2)[1]);
 	           if(command.equals("SET"))
 	           {
-	        	   String[] s = first.split(" ", 4);
-	        	   gp.SET(Integer.parseInt(s[1]), Integer.parseInt(s[2]), Integer.parseInt(s[3]));
+	        	   try
+	        	   {
+		        	   String[] s = first.split(" ", 5);
+		        	   gp.SET(Integer.parseInt(s[2]), Integer.parseInt(s[1]), Integer.parseInt(s[3]), s[4]);
+		           }
+	        	   catch(ArrayIndexOutOfBoundsException e)
+	        	   {
+	        		   String[] s = first.split(" ", 4);
+		        	   gp.SET(Integer.parseInt(s[2]), Integer.parseInt(s[1]), Integer.parseInt(s[3]), "");
+	        	   }
 	           }
 	           if(command.equals("FLUSH"))
 	        	   gp.FLUSH();
