@@ -38,14 +38,7 @@ public class GUIServer implements Runnable
 	public void FLUSH(){sendString("FLUSH");}
 	public void SIZE(int w, int h){sendString("SIZE "+w+" "+h);}
 	public void MESSAGE(String m){sendString("MESSAGE "+m);}
-	public void SET(int y, int x, int color, boolean exploding)
-	{
-		sendString("SET "+y+" "+x+" "+color+(exploding?" EXPLODE":""));
-	}
-	public void SET(int y, int x, int color)
-	{
-		SET(y,x,color,false);
-	}
+	public void SET(int y, int x, int color, boolean exploding){sendString("SET "+y+" "+x+" "+color+(exploding?" explode":""));}
 	public void RESET(boolean field, boolean players, boolean colors, boolean points, boolean messages)
 	{
 		String paket="RESET";

@@ -112,7 +112,7 @@ public class GamePanel extends JPanel
 		}
 		players.add(new Player(n, name));
 	}
-	public void SET(int row, int column, int color)
+	public void SET(int column, int row, int color, String effect)
 	{
 		if (color==0)
 		{

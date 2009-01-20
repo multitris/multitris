@@ -47,8 +47,16 @@ public class Client
 	        	   gp.AUTH(first.split(" ", 2)[1]);
 	           if(command.equals("SET"))
 	           {
-	        	   String[] s = first.split(" ", 4);
-	        	   gp.SET(Integer.parseInt(s[1]), Integer.parseInt(s[2]), Integer.parseInt(s[3]));
+	        	   try
+	        	   {
+		        	   String[] s = first.split(" ", 5);
+		        	   gp.SET(Integer.parseInt(s[2]), Integer.parseInt(s[1]), Integer.parseInt(s[3]), s[4]);
+		           }
+	        	   catch(ArrayIndexOutOfBoundsException e)
+	        	   {
+	        		   String[] s = first.split(" ", 4);
+		        	   gp.SET(Integer.parseInt(s[2]), Integer.parseInt(s[1]), Integer.parseInt(s[3]), "");
+	        	   }
 	           }
 	           if(command.equals("FLUSH"))
 	        	   gp.FLUSH();

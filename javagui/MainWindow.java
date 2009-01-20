@@ -55,8 +55,8 @@ public class MainWindow extends JFrame
 		gp.FLUSH();
 		delay(2000);
 		gp.MESSAGE("Welcome all the Players, let's rock!");
-		gp.SET(0,0,2);
-		gp.SET(0, 1, 3);
+		gp.SET(0,0,2, "");
+		gp.SET(0, 1, 3, "");
 		gp.FLUSH();
 		gp.MESSAGE("Now we'll let it rand a little bit...");
 		gp.FLUSH();
@@ -65,7 +65,7 @@ public class MainWindow extends JFrame
 		{
 			for (int x=0;x<100;x++)
 				for(int y=0;y<100;y++)
-					gp.SET(x, y, rnd(0,5));
+					gp.SET(x, y, rnd(0,5), "");
 			gp.FLUSH();
 			delay(100);
 		}
@@ -78,7 +78,7 @@ public class MainWindow extends JFrame
 				int pm = ((x%2)==0)?1:-1;
 				for(int y=((x%2)==0)?0:99;y!=end;y+=pm)
 				{
-					gp.SET(y, x, 1);
+					gp.SET(x, y, 1, "");
 					gp.FLUSH();
 					delay(10);
 				}
