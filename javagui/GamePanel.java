@@ -1,4 +1,5 @@
 package javagui;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 import java.util.LinkedList;
@@ -15,9 +16,32 @@ public class GamePanel extends JPanel
 	private int height = wheight-mheight;
 	private int vwidth = 1;
 	private int vheight = 1;
+	private Color bgcolor=new Color(0,0,0);
 	private Color [][] pixmatrix;
 	private LinkedList<Player> players;
 	private String[] messages;
+	public void autoresize()
+	{
+		Dimension d = this.getSize();
+		wwidth=d.width;
+		wheight=d.height;
+		width = wwidth-nwidth;
+		height = wheight-mheight;
+		if ((width/vwidth) > (height/vheight))
+		{
+			width=vwidth*(height/vheight);
+		}
+		else
+		{
+			height=vheight*(width/vwidth);
+		}
+		FLUSH();
+	}
+	public void doLayout()
+	{
+		super.doLayout();
+		this.autoresize();
+	}
 	private Color convertColor(String hexcolor)
 	{
 		try
@@ -37,8 +61,7 @@ public class GamePanel extends JPanel
 	{
 		if (field)
 		{
-			vwidth=0;
-			vheight=0;
+			pixmatrix = new Color[vwidth][vheight];
 		}
 		if (points)
 		{
@@ -91,6 +114,11 @@ public class GamePanel extends JPanel
 	}
 	public void SET(int row, int column, int color)
 	{
+		if (color==0)
+		{
+			pixmatrix[column][row]=null;
+			return;
+		}
 		for(int i=0;i<players.size();i++)
 			if (players.get(i).ID==color)
 			{
@@ -123,11 +151,10 @@ public class GamePanel extends JPanel
 		pixmatrix = new Color [vwidth] [vheight];
 		players=new LinkedList<Player>();
 		messages=new String[MAXMESSAGES];
-		COLOR(0, "000000");
 	}
 	public void paint(Graphics g)
 	{
-		g.setColor(new Color(0,0,0));
+		g.setColor(bgcolor);
 		g.fillRect(0, 0, wwidth, wheight);
 		for (int x=0;x<pixmatrix.length;x++)
 			for (int y=0;y<pixmatrix.length;y++)
@@ -144,7 +171,7 @@ public class GamePanel extends JPanel
 			if(players.get(i).name!="")
 			{
 				g.setColor(players.get(i).color);
-				g.drawString(players.get(i).name, width+5, 20+25*(y++));
+				g.drawString(players.get(i).name+": "+players.get(i).points, width+5, 20+25*(y++));
 			}
 		
 		y=0;

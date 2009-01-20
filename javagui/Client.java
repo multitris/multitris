@@ -22,8 +22,6 @@ public class Client
            String first;
            while((first=in.readLine())!=null)
            {
-        	   System.out.println("Got:"+first);
-        	   
         	   String command = first.split(" ", 3)[0];
 	           if(command.equals("POINTS"))
 	           {
@@ -83,7 +81,8 @@ public class Client
         }
     }
     public void loop(){
-        try
+        gp.MESSAGE("Trying to connect...");
+    	try
         {
         	Socket cs = new Socket(url, port);
             BufferedReader in
@@ -92,11 +91,14 @@ public class Client
                           cs.getInputStream() ) );
                 processRequest(in);
                 cs.close();
-                System.out.println("Server closed connection.");
-                System.exit(0);
+                gp.MESSAGE("Server closed connection.");
         }
+    	catch(ConnectException e)
+    	{
+    		gp.MESSAGE("Server not found... startig Demo");
+    	}
         catch( Exception e ){
-             System.err.println( e.toString() );
+             gp.MESSAGE( e.toString() );
         }
     }
 }

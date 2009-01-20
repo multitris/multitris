@@ -2,14 +2,20 @@ package javagui;
 
 import javax.swing.JFrame;
 import java.util.Random;
-public class MainWindow extends JFrame 
+import java.awt.Dimension;
+import java.awt.event.*;
+
+public class MainWindow extends JFrame implements WindowStateListener
 {
+	private GamePanel gp;
 	public MainWindow(GamePanel gp)
 	{
 		this.setContentPane(gp);
 		this.setSize(1024,768);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.gp=gp;
+		this.addWindowStateListener(this);
 	}
 	public static int rnd(int min, int max)
 	{
@@ -31,17 +37,12 @@ public class MainWindow extends JFrame
 			System.out.println(e);
 		}
 	}
-	public static void main(String[] args)
+	public static void demo(GamePanel gp)
 	{
-		GamePanel gp = new GamePanel();
-		MainWindow MW = new MainWindow(gp);
-		Client s = new Client(gp, "localhost", 12345);
-		s.loop();
 		gp.SIZE(20,20);
 		gp.COLOR(1, "0000ff");
 		gp.COLOR(2, "ff0000");
 		gp.COLOR(3, "00FF00");
-		gp.MESSAGE("No Server found... starting Demo....");
 		gp.FLUSH();
 		delay(2000);
 		gp.PLAYER(3, "Peter");
@@ -70,7 +71,18 @@ public class MainWindow extends JFrame
 		}
 		gp.MESSAGE("Fertig");
 		gp.FLUSH();
-		//Server s = new Server(gp);
-		//s.loop();
+	
+	}
+	public static void main(String[] args)
+	{
+		GamePanel gp = new GamePanel();
+		MainWindow MW = new MainWindow(gp);
+		Client s = new Client(gp, "localhost", 12345);
+		s.loop();
+		demo(gp);
+	}
+	public void windowStateChanged(WindowEvent e) {
+		// TODO Auto-generated method stub
+		//Dimension d=this.getSize();
 	}
 }
