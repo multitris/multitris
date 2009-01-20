@@ -31,21 +31,14 @@ TIME= 0.1
 
 require 'socket'
 
-class Integer
-
-	def to_hex
-		self>=16 ? (self/16).to_hex : "" +
-		(("0".."9").to_a+("A".."F").to_a)[self % 16]
-	end
-
-end
-
 Block= Struct.new(:x, :y, :color, :speed, :count)
 
 socket= TCPServer.new(PORT).accept
 socket.puts "SIZE #{HEIGHT} #{WIDTH}"
 COLORS.times do |i|
-	socket.puts "COLOR #{(rand*65536).floor.to_hex}"
+	color= (rand*16777216).floor.to_s(16)
+	color= "0"*(6-color.size) + color
+	socket.puts "COLOR #{i} #{color}"
 end
 
 blocks= []
