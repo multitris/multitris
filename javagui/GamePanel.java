@@ -10,13 +10,12 @@ public class GamePanel extends JPanel
 	private int wwidth= 1024;
 	private int wheight= 768;
 	private int nwidth = 100;//width of the names Panel;
-	private int mheight = 100;//height of the Messages Panel;
+	private int mheight = 150;//height of the Messages Panel;
 	private int width = wwidth-nwidth;
 	private int height = wheight-mheight;
-	private int vwidth = 0;
-	private int vheight = 0;
+	private int vwidth = 1;
+	private int vheight = 1;
 	private Color [][] pixmatrix;
-	private String authstring;
 	private LinkedList<Player> players;
 	private String[] messages;
 	private Color convertColor(String hexcolor)
@@ -49,7 +48,7 @@ public class GamePanel extends JPanel
 	}
 	public void AUTH(String s)
 	{
-		authstring=s;
+		MESSAGE(s);
 	}
 	public void SIZE(int w, int h)
 	{
@@ -119,7 +118,7 @@ public class GamePanel extends JPanel
 	}
 	public void paint(Graphics g)
 	{
-		g.clearRect(0, 0, width, height);
+		g.clearRect(0, 0, wwidth, wheight);
 		
 		for (int x=0;x<pixmatrix.length;x++)
 			for (int y=0;y<pixmatrix.length;y++)
@@ -136,7 +135,7 @@ public class GamePanel extends JPanel
 			if(players.get(i).name!="")
 			{
 				g.setColor(players.get(i).color);
-				g.drawString(players.get(i).name, width+5, 10+25*(y++));
+				g.drawString(players.get(i).name, width+5, 20+25*(y++));
 			}
 		
 		y=0;
