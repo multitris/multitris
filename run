@@ -1,0 +1,4 @@
+#!/bin/bash
+java javagui.MainWindow&
+java javaclient.GUI&
+java multitrisserver.GameLogic

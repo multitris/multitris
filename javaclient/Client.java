@@ -1,4 +1,6 @@
 package javaclient;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -8,9 +10,11 @@ public class Client implements Runnable
 	private int port;
 	private BufferedReader in;
 	private OutputStreamWriter out;
+	private GUI GUI;
 	
-	public Client(String url, int Port) throws Exception
+	public Client(String url, int Port, GUI gui) throws Exception
 	{
+		this.GUI=gui;
 		this.url=url;
 		this.port=Port;
     	Socket cs = new Socket(url, port);
@@ -32,7 +36,6 @@ public class Client implements Runnable
 			System.out.println("Error in sendString:"+e);
 		}
 	}
-
 	public void run() 
 	{  
        try 
@@ -40,12 +43,11 @@ public class Client implements Runnable
            String first;
            while((first=in.readLine())!=null)
            {
-        	   System.out.println(first);
-        	   String command = first.split(" ", 2)[0];
-	           if(command.equals("CHUCK"))
-	           {
-	        	   sendString("NORRIS "+first.split(" ", 2)[1]);
-	           }
+        	   String[] x = first.split(" ", 2);
+        	   if (x.length==1)
+        		   GUI.networkDataArrived(x[0], "");
+        	   else
+        		   GUI.networkDataArrived(x[0], x[1]);
            }
         }
        catch( Exception e )

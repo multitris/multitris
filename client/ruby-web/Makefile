@@ -20,7 +20,7 @@
 all: make-io2io make-magicmime
 
 clean: clean-io2io clean-magicmime
-	rm sendhttp.tar.gz
+	rm -f sendhttp.tar.gz
 
 make-io2io:
 	make -C io2io

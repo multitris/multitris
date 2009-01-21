@@ -11,7 +11,23 @@ public class GUI extends JFrame implements ActionListener
 	private JButton bRight;
 	private JButton bTurn;
 	private Client client;
+	private boolean loggedIn;
 	
+	private void delay(int ms)
+	{
+		try
+		{
+			Thread.sleep(ms);
+		}
+		catch (Exception e)
+		{}
+	}
+	private void enableGUI(boolean enable)
+	{
+		bLeft.setEnabled(enable);
+		bRight.setEnabled(enable);
+		bTurn.setEnabled(enable);
+	}
 	public GUI(String Name, String URL, int Port)
 	{
 		if (Name.equals("") || URL.equals("") || Port==0)
@@ -30,7 +46,7 @@ public class GUI extends JFrame implements ActionListener
 		{
 			try
 			{
-				client=new Client(URL, Port);
+				client=new Client(URL, Port, this);
 			}
 			catch (Exception e)
 			{
@@ -47,10 +63,14 @@ public class GUI extends JFrame implements ActionListener
 			}
 		}
 		client.sendString("IWANTFUN 1.0 "+Name);
+		while (!loggedIn)
+			delay(200);
+		
 		JPanel mainPanel = new JPanel();
 		bLeft = new JButton("<-");
 		bRight = new JButton("->");
 		bTurn = new JButton("o");	
+		enableGUI(false);
 		bRight.addActionListener(this);
 		bTurn.addActionListener(this);
 		bLeft.addActionListener(this);
@@ -62,6 +82,30 @@ public class GUI extends JFrame implements ActionListener
 		this.setContentPane(mainPanel);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+	public void networkDataArrived(String command, String parameter)
+	{
+		if (command.equals("GOFORREST"))
+		{
+			enableGUI(true);
+		}
+		if (command.equals("PLONK"))
+		{
+			enableGUI(false);
+		}
+		if (command.equals("ATTENTION"))
+		{
+			loggedIn=true;
+		}
+         if(command.equals("CHUCK"))
+         {
+      	   client.sendString("NORRIS "+parameter);
+         }
+         if(command.equals("FUCKYOU"))
+         {
+      	   JOptionPane.showMessageDialog(this, parameter);
+      	   System.exit(0);
+         }
 	}
 	public void actionPerformed(ActionEvent e) 
 	{

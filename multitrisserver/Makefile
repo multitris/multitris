@@ -4,4 +4,4 @@ all: $(OBJECTS)
 	javac $(OBJECTS)
 
 clean:
-	*.class
+	rm -f *.class
