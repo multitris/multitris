@@ -18,8 +18,8 @@ public class GameLogic
 	public GameLogic()
 	{
 		this.stones = new LinkedList<Stone>();
-		this.width = 30;
-		this.height = 40;
+		this.width = 10;
+		this.height = 30;
 		
 		System.out.println("Connect your GUI to port 12345, please :)");
 		this.gui = new GUIServer(12345);
@@ -246,6 +246,7 @@ public class GameLogic
 	private void gameStep()
 	{
 		this.moveAllDown();
+		this.fieldObserver.flush(this.gui);
 		this.removeCompletedRows();
 		this.fieldObserver.flush(this.gui);
 		
