@@ -89,8 +89,8 @@ end
 socket.puts "PLAYER 1 neo"
 socket.puts "PLAYER 2 smith"
 socket.puts "POINTS 1 42"
-socket.puts "POINTS 1 23"
-socket.puts "MESSAGE the Matrix has you neo"
+socket.puts "POINTS 2 23"
+socket.puts "MESSAGE the tetrisMatrix has you neo"
 
 last= Time.now
 points= 0
