@@ -56,6 +56,9 @@ public class FieldObserver
 					
 	public void flush(GUIServer gui)
 	{
+		if(this.changes.size() == 0) // nothing to flush
+			return;
+		
 		while(this.changes.size() != 0)
 		{
 			FieldObserverChange change = this.changes.get(0);

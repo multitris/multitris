@@ -28,7 +28,8 @@ public class Player
 		catch(Exception e)
 		{
 			System.err.println("1:"+e);
-			this.playerSocket = null;
+			this.disconnect();
+			parent.playerDied(this);
 		}
 	}
 	
@@ -128,16 +129,8 @@ public class Player
 			catch (Exception e)
 			{
 				System.err.println("2:" + e);
-				try
-				{
-					this.playerSocket.close();
-				}
-				catch (Exception e2)
-				{
-					System.err.println("3:" + e2);
-				}
-				this.playerSocket = null;
-				parent.playerDied(this);
+				this.disconnect();
+				this.parent.playerDied(this);
 			}
 		}
 	}
@@ -241,6 +234,8 @@ public class Player
 			catch (Exception e)
 			{
 				System.err.println("5:"+e);
+				this.disconnect();
+				this.parent.playerDied(this);
 			}
 		}
 	}

@@ -135,16 +135,19 @@ public class PlayerManager implements Runnable
 			{
 				if(this.players.get(player).getColor() == i)
 				{
-					exists = true;
-					gui.PLAYER(i, this.players.get(player).getName());
-					gui.POINTS(i, this.players.get(player).getPoints());
+					if(this.players.get(player).isAlive())
+					{
+						exists = true;
+						gui.PLAYER(i, this.players.get(player).getName());
+						gui.POINTS(i, this.players.get(player).getPoints());
+					}
 					break;
 				}
 			}
 			
 			if(! exists)
 			{
-				gui.PLAYER(i, "");
+				gui.PLAYER(i);
 				gui.POINTS(i, 0);
 			}
 		}
@@ -188,7 +191,9 @@ public class PlayerManager implements Runnable
 				this.players.remove(i--);
 			else
 			{
-				this.players.get(i).setColor(this.generateColor());
+				int generatedColor = this.generateColor();
+				this.players.get(i).setColor(generatedColor);
+				this.players.get(i).sendToClient("ATTENTION " + this.colors[generatedColor] + " " + generatedColor);
 				if(! this.players.get(i).isPlaying())
 					this.nextActivatedPlayers.offer(this.players.get(i));
 			}

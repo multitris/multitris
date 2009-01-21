@@ -57,6 +57,8 @@ public class GUIServer implements Runnable
 			paket+=" POINTS";
 		if (players)
 			paket+=" PLAYERS";
+		if (players)
+			paket+=" COLORS";
 		if (messages)
 			paket+=" MESSAGES";
 	}
@@ -64,6 +66,7 @@ public class GUIServer implements Runnable
 	public void AUTH(String auth){sendString("AUTH "+auth);}
 	public void COLOR(int number, String color){sendString("COLOR "+number+" "+color);}
 	public void PLAYER(int number, String name){sendString("PLAYER "+number+" "+name);}
+	public void PLAYER(int number){sendString("PLAYER "+number);}
 	public GUIServer(int Port)
 	{
 		try

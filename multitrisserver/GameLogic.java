@@ -13,22 +13,42 @@ public class GameLogic
 	private GUIServer gui;
 	private boolean goOnPlaying=true;
 	private long nextGameStep = 0;
+	private long nextGameSpeedIncrease = 0;
 	private PlayerManager playerManager = null;
+	private int currentSpeed;
+	
+	/* CONFIG *****************/
+	private static final int DEFAULTWIDTH = 20;
+	private static final int DEFAULTHEIGHT = 30;
+	private static final int PLAYNUMBEROFGAMES = 10; // after this number of games played, the game will terminate. zero = play forever (yeeha!)
+	private static final int SLEEPBETWEENGAMES = 15; // number of seconds between the end of one game and the beginning of the next one
+	private static final int DEFAULTSPEED = 500; // milliseconds between two gamesteps (i.e. two moveAllDown()s); smaller number = faster game
+	private static final int SLEEPINGTIME = 50; // milliseconds between two steps (i.e. processing user input etc.); smaller number = quicker reaction
+	private static final int GUIPORT = 12345;
+	private static final int CLIENTSPORT = 12346;
+	private static final int INCREASESPEEDABOUT = 50; // this value will be substracted from the current speed if the players are too good ;) can be zero for no gamespeed regulation
+	private static final int INCREASESPEEDAFTER = 45; // gamespeed regulation time rate: every X seconds the gamespeed is increased
+	private static final int WINNINGSPEED = 200; // if gameOver is called, print winning message if the current gamespeed is at least as fast as this. may be zero to frustrate clients (no winning message will be printed).
+	private static final double NEWSTONEPROPABILITY = 0.4; // maximum propability of inserting a new stone into the game in one gamestep (depends on available space / available players)
+	/* END CONFIG *************/
 	
 	public GameLogic()
 	{
 		this.stones = new LinkedList<Stone>();
-		this.width = 10;
-		this.height = 30;
+		this.width = DEFAULTWIDTH;
+		this.height = DEFAULTHEIGHT;
 		
-		System.out.println("Connect your GUI to port 12345, please :)");
-		this.gui = new GUIServer(12345);
-		System.out.println("Thx. Game is started. Clients are welcome: Use port 12346.");
-		this.playerManager = new PlayerManager(this, 12346);
+		System.out.println("Connect your GUI to port "+GUIPORT+", please :)");
+		this.gui = new GUIServer(GUIPORT);
+		System.out.println("Thx. Game is started. Clients are welcome: Use port "+CLIENTSPORT+".");
+		this.playerManager = new PlayerManager(this, CLIENTSPORT);
 	}
 	
 	public void startGame()
 	{
+		this.currentSpeed = DEFAULTSPEED;
+		this.goOnPlaying = true;
+		this.nextGameSpeedIncrease = (new Date()).getTime() + 1000*INCREASESPEEDAFTER;
 		this.fixedPixels = new int[this.height][];
 		for(int row=0;row<this.height;row++)
 		{
@@ -42,7 +62,10 @@ public class GameLogic
 		this.gui.SIZE(this.width, this.height);
 		this.gui.RESET(true, true, true, true, true);
 		
+		this.playerManager.cleanUp();
 		this.playerManager.listGui(this.gui);
+		
+		this.gui.FLUSH();
 		
 		while(this.goOnPlaying)
 		{
@@ -50,7 +73,7 @@ public class GameLogic
 			
 			try
 			{
-				Thread.sleep(50);
+				Thread.sleep(SLEEPINGTIME);
 			}
 			catch(Exception e)
 			{
@@ -66,7 +89,32 @@ public class GameLogic
 		this.gui.close();
 	}
 	
-/*	private void debug_printField() // pseudo-gui, for debugging purposes only
+	public void takeOverControl()
+	{
+		for(int currentGameNo=0;(PLAYNUMBEROFGAMES==0 || currentGameNo<PLAYNUMBEROFGAMES);currentGameNo++)
+		{
+			this.startGame();
+			
+			if(PLAYNUMBEROFGAMES == 0 || (currentGameNo+1)<PLAYNUMBEROFGAMES)
+			{
+				this.gui.MESSAGE("Prepare for the next game, it will start in " + SLEEPBETWEENGAMES + " seconds...");
+				for(int secondsWaited=0;secondsWaited<SLEEPBETWEENGAMES;secondsWaited++)
+				{
+					try
+					{
+						Thread.sleep(1000);
+					}
+					catch(Exception e)
+					{
+						System.err.println(e);
+					}
+					this.playerManager.step();
+				}
+			}
+		}
+	}
+	
+	/*private void debug_printField() // pseudo-gui, for debugging purposes only
 	{
 		char[][] pixels = new char[this.height][];
 		for(int row=0;row<this.height;row++)
@@ -234,9 +282,19 @@ public class GameLogic
 	
 	public void step()
 	{
-		if(this.nextGameStep <= (new Date()).getTime())
+		long now = (new Date()).getTime();
+		
+		if(this.nextGameStep <= now)
 		{
-			this.nextGameStep = (new Date()).getTime() + 500;
+			// time for increasing speed?
+			if(INCREASESPEEDAFTER > 0 && this.nextGameSpeedIncrease <= now)
+			{
+				this.nextGameSpeedIncrease = now + 1000*INCREASESPEEDAFTER;
+				if(this.currentSpeed > INCREASESPEEDABOUT)
+					this.currentSpeed -= INCREASESPEEDABOUT;
+			}
+			
+			this.nextGameStep = now + this.currentSpeed;
 			this.gameStep();
 		}
 		
@@ -248,7 +306,6 @@ public class GameLogic
 		this.moveAllDown();
 		this.fieldObserver.flush(this.gui);
 		this.removeCompletedRows();
-		this.fieldObserver.flush(this.gui);
 		
 		// check gameOver
 		boolean gameOver = false;
@@ -267,7 +324,7 @@ public class GameLogic
 		{
 			// new stone?
 			
-			if(Math.random() < 0.25)
+			if(Math.random() < NEWSTONEPROPABILITY)
 			{
 				Stone tryThisStone = Stone.randomStone();
 				tryThisStone.setY(1-tryThisStone.getHeight());
@@ -295,9 +352,20 @@ public class GameLogic
 		//
 		// when the A stone is turned into fixed pixels, stone A completes two rows. if they were removed directly, stone B would collide with the fixed pixels at the very top. therefore we have to check whether the rows can really be removed. don't be sad if not, it will probably happen the next time removeCompletedRows() is called.
 		
-		for(int row=this.height-1;row>=0;row--)
+		int[][] beforeRemoval = this.fixedPixels;
+		int[][] afterRemoval = new int[this.height][];
+		boolean[] rowExploded = new boolean[this.height];
+		
+		for(int row=0;row<this.height;row++)
 		{
-			// complete?
+			afterRemoval[row] = beforeRemoval[row];
+			rowExploded[row] = false;
+		}
+		boolean anyRowsRemoved = false;
+		
+		for(int row=0;row<this.height;row++)
+		{
+			// check whether complete
 			boolean complete = true;
 			for(int col=0;col<this.width;col++)
 			{
@@ -310,23 +378,25 @@ public class GameLogic
 			
 			if(complete)
 			{
-				// remove row and insert new one
-				int[][] newFixedPixels = new int[this.height][];
-				newFixedPixels[0] = new int[this.width];
-				for(int col=0;col<this.width;col++)
-					newFixedPixels[0][col] = 0;
-				
-				for(int copyrow=1;copyrow<this.height;copyrow++)
+				int[][] possibleNewField = new int[this.height][];
+				for(int newrow=this.height-1;newrow>0;newrow--)
 				{
-					newFixedPixels[copyrow] = this.fixedPixels[copyrow <= row ? (copyrow-1) : copyrow];
+					if(newrow > row) // copy old row
+						possibleNewField[newrow] = afterRemoval[newrow];
+					else // copy the one above
+						possibleNewField[newrow] = afterRemoval[newrow-1];
 				}
+				// insert blank row at the top
+				possibleNewField[0] = new int[this.width];
+				for(int col=0;col<this.width;col++)
+					possibleNewField[0][col] = 0;
 				
 				// now let's see whether we can remove it
 				
 				boolean canRemove = true;
 				for(int i=0;i<this.stones.size();i++)
 				{
-					if(this.stones.get(i).collidesWith(newFixedPixels))
+					if(this.stones.get(i).collidesWith(possibleNewField))
 					{
 						canRemove = false;
 						break;
@@ -335,19 +405,30 @@ public class GameLogic
 				
 				if(canRemove)
 				{
-					this.fixedPixels = newFixedPixels;
-					// let's do some ugly stuff :)
-					for(int updateRow=row;updateRow<this.height;updateRow++)
-					{
-						for(int updateCol=0;updateCol<this.width;updateCol++)
-							this.fieldObserver.fixedPixelChanged(updateRow, updateCol, newFixedPixels[updateRow][updateCol], (updateRow==row));
-					}
-					for(int i=0;i<this.stones.size();i++)
-						this.fieldObserver.stoneChanged(this.stones.get(i), this.stones.get(i)); // yes he HAS changed! I'm totally sure! ;)
-					
-					row++; // re-check current row
+					afterRemoval = possibleNewField;
+					anyRowsRemoved = true;
+					rowExploded[row] = true;
+				}
+				else
+					break; // if this row cannot be removed, the next ones won't be safe to remove either
+			}
+		}
+		
+		// if rows have been removed, tell our fieldObserver
+		if(anyRowsRemoved)
+		{
+			for(int row=0;row<this.height;row++)
+			{
+				for(int col=0;col<this.width;col++)
+				{
+					// notify fieldObserver if row exploded and/or pixel value changed
+					if(rowExploded[row] || afterRemoval[row][col] != beforeRemoval[row][col])
+						this.fieldObserver.fixedPixelChanged(row, col, afterRemoval[row][col], rowExploded[row]);
 				}
 			}
+			
+			this.fixedPixels = afterRemoval;
+			this.fieldObserver.flush(this.gui);
 		}
 	}
 	
@@ -365,8 +446,16 @@ public class GameLogic
 	
 	private void gameOver()
 	{
-		this.gui.MESSAGE("Ohhhh you lost :(");
-		this.playerManager.allPlayersLost();
+		if(this.currentSpeed <= WINNINGSPEED)
+		{
+			this.gui.MESSAGE("Wow, that was fast. Well done!");
+			this.playerManager.allPlayersWon();
+		}
+		else
+		{
+			this.gui.MESSAGE("Sorry, you lost :(");
+			this.playerManager.allPlayersLost();
+		}
 		this.goOnPlaying = false; // stop the game
 	}
 	
@@ -378,7 +467,7 @@ public class GameLogic
 	public static void main(String[] args)
 	{
 		GameLogic GL = new GameLogic();
-		GL.startGame();		
+		GL.takeOverControl();
 		GL.shutDown();
 		System.out.println("Thanks for playing");
 	}
