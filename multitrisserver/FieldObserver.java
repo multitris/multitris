@@ -28,7 +28,7 @@ public class FieldObserver
 		for(int i=0;i<newPixels.length;i++)
 		{
 			if(newPixels[i][0] > -1 && newPixels[i][0] < this.height && newPixels[i][1] > -1 && newPixels[i][1] < this.width)
-				this.addChange(new FieldObserverChange(newPixels[i][0], oldPixels[i][1], newStone.getColor(), false));
+				this.addChange(new FieldObserverChange(newPixels[i][0], newPixels[i][1], newStone.getColor(), false));
 		}
 	}
 	
@@ -60,7 +60,6 @@ public class FieldObserver
 		{
 			FieldObserverChange change = this.changes.get(0);
 			gui.SET(change.getY(), change.getX(), change.getColor(), change.getExploding());
-			System.out.println("SET " + change.getY() + " " + change.getX() + " " + change.getColor() + (change.getExploding() ? " explode" : "")); // debug
 			this.changes.remove(0);
 		}
 		gui.FLUSH();

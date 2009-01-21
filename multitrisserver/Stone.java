@@ -89,6 +89,7 @@ public class Stone
 		Stone copy = new Stone(this.matrix);
 		copy.setX(this.x);
 		copy.setY(this.y);
+		copy.setColor(this.color);
 		
 		return copy;
 	}

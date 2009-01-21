@@ -2,6 +2,7 @@ package multitrisserver;
 
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
+import java.net.SocketTimeoutException;
 import java.net.Socket;
 import java.util.LinkedList;
 /**
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 public class GUIServer implements Runnable
 {
 	private boolean keepRunning;
+	private boolean someoneConnected;
 	private ServerSocket sSock;
 	private LinkedList<OutputStreamWriter> clients;
 	private void sendString(String s)
@@ -69,7 +71,10 @@ public class GUIServer implements Runnable
 			sSock = new ServerSocket(Port);
 			clients = new LinkedList<OutputStreamWriter>();
 			keepRunning=true;
+			someoneConnected=false;
 			new Thread(this).start();
+			while(!someoneConnected)
+				Thread.sleep(200);
 		}
 		catch(Exception e)
 		{
@@ -82,12 +87,17 @@ public class GUIServer implements Runnable
 		{
 			try
 			{
+				sSock.setSoTimeout(1000);
 				Socket clientSocket=sSock.accept();//wait for a client to connect
-				System.out.println("New Client connected");
+				someoneConnected=true;
 	            OutputStreamWriter out
 	               = new OutputStreamWriter(
 	                    clientSocket.getOutputStream() );
 	            clients.add(out);
+			}
+			catch (SocketTimeoutException e)
+			{
+				//do nothing
 			}
 			catch (Exception e)
 			{

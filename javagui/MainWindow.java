@@ -88,6 +88,8 @@ public class MainWindow extends JFrame
 	{
 		GamePanel gp = new GamePanel();
 		MainWindow MW = new MainWindow(gp);
+		gp.SIZE(20,10);//dummy
+		gp.COLOR(1, "ff0000");
 		Client c = new Client(gp, "localhost", 12345);
 		c.loop();
 		demo(gp);

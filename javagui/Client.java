@@ -22,6 +22,7 @@ public class Client
            String first;
            while((first=in.readLine())!=null)
            {
+        	   System.out.println(first);
         	   String command = first.split(" ", 3)[0];
 	           if(command.equals("POINTS"))
 	           {

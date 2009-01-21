@@ -17,8 +17,10 @@ public class GamePanel extends JPanel
 	private int vwidth = 1;
 	private int vheight = 1;
 	private Color bgcolor=new Color(0,0,0);
+	private Color borderColor = new Color(255,255,255);
 	private Color [][] pixmatrix;
 	private LinkedList<Player> players;
+	private LinkedList<int[]>explodingPixels;
 	private String[] messages;
 	public void autoresize()
 	{
@@ -114,6 +116,8 @@ public class GamePanel extends JPanel
 	}
 	public void SET(int column, int row, int color, String effect)
 	{
+		if (effect.equals("EXPLODE"))
+			explodingPixels.add(new int[]{column, row});
 		if (color==0)
 		{
 			pixmatrix[column][row]=null;
@@ -150,10 +154,27 @@ public class GamePanel extends JPanel
 		this.setSize(width,height);
 		pixmatrix = new Color [vwidth] [vheight];
 		players=new LinkedList<Player>();
+		explodingPixels=new LinkedList<int[]>();
 		messages=new String[MAXMESSAGES];
 	}
 	public void paint(Graphics g)
 	{
+		if (explodingPixels.size()!=0)
+		{
+			g.setColor(new Color(255,0,255));
+			System.out.println("Exploding...");
+			for (int r=1;r<20;r+=2)
+			{
+				for(int i=0;i<explodingPixels.size();i++)
+				{
+					int x=explodingPixels.get(i)[0];
+					int y=explodingPixels.get(i)[1];
+					g.drawArc(x*(width/vwidth), y*(height/vheight), r, r, 0, 0);
+					//DOESNT RUN WELL!!! WINDOW IS NOT REFRESHED DURING PAINT()... FUCK OF JAVA!
+				}
+			}
+			explodingPixels.clear();
+		}
 		g.setColor(bgcolor);
 		g.fillRect(0, 0, wwidth, wheight);
 		for (int x=0;x<vwidth;x++)
@@ -163,6 +184,8 @@ public class GamePanel extends JPanel
 				{
 					g.setColor(pixmatrix[x][y]);
 					g.fillRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (width/vwidth));
+					g.setColor(borderColor);
+					g.drawRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (width/vwidth));
 				}
 			}
 		
@@ -173,7 +196,6 @@ public class GamePanel extends JPanel
 				g.setColor(players.get(i).color);
 				g.drawString(players.get(i).name+": "+players.get(i).points, width+5, 20+25*(y++));
 			}
-		
 		y=0;
 		g.setColor(new Color(255,255,255));
 		for (int i=0;i<MAXMESSAGES;i++)
