@@ -3,10 +3,13 @@ package javaclient;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 import javax.swing.*;
 import common.*;
  
-public class GUI extends JFrame implements ActionListener
+public class GUI extends JFrame implements ActionListener, KeyListener
 {
 	private JButton bLeft;
 	private JButton bRight;
@@ -94,6 +97,9 @@ public class GUI extends JFrame implements ActionListener
 		mainPanel.add(bLeft);
 		mainPanel.add(bTurn);
 		mainPanel.add(bRight);
+		JButton tmp = new JButton("KeyboardControl");
+		tmp.addKeyListener(this);
+		mainPanel.add(tmp);
 		mainPanel.doLayout();
 		this.setContentPane(mainPanel);
 		this.setVisible(true);
@@ -139,5 +145,22 @@ public class GUI extends JFrame implements ActionListener
 			new GUI(args[0], args[1], Integer.parseInt(args[2]));
 		else
 			new GUI("", "", 0);
+	}
+	public void keyPressed(KeyEvent e) 
+	{
+		if (e.getKeyCode()==java.awt.event.KeyEvent.VK_LEFT)
+			actionPerformed(new ActionEvent(bLeft, 0, "lala"));
+		if (e.getKeyCode()==java.awt.event.KeyEvent.VK_RIGHT)
+			actionPerformed(new ActionEvent(bRight, 0, "lala"));
+		if (e.getKeyCode()==java.awt.event.KeyEvent.VK_SPACE)
+			actionPerformed(new ActionEvent(bTurn, 0, "lala"));
+	}
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
