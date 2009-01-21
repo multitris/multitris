@@ -220,7 +220,7 @@ public class Player
 					maybeCompleteLinesAvailable = false;
 					if(this.playerSocketIn.ready())
 					{
-						this.playerSocketIn.mark(0); // TODO: big commands are cut down, not very beautiful
+						this.playerSocketIn.mark(255); // TODO: big commands are cut down, not very beautiful
 						int read = 0;
 						while(read != -1)
 						{
