@@ -2,9 +2,9 @@ package javaclient;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.*;
-
+import common.*;
+ 
 public class GUI extends JFrame implements ActionListener
 {
 	private JButton bLeft;
@@ -14,6 +14,18 @@ public class GUI extends JFrame implements ActionListener
 	
 	public GUI(String Name, String URL, int Port)
 	{
+		if (Name.equals("") || URL.equals("") || Port==0)
+		{
+			MultiRequester m = new MultiRequester(new String[]{"Name", "URL", "Port"}, 
+					new String[]{"Player 1", "localhost", "12346"}, 
+					"Bitte Namen, Port und URL eingeben.");
+			String[] r = m.getResult();
+			if (r==null)
+				System.exit(0);
+			Name = r[0];
+			URL = r[1];
+			Port = Integer.parseInt(r[2]);
+		}
 		while(client==null)
 		{
 			try
@@ -25,10 +37,12 @@ public class GUI extends JFrame implements ActionListener
 				JOptionPane.showMessageDialog(null, "Konnte nicht verbinden: "+e+
 										"\n"+"URL: "+URL+"\n"
 										+"Port: "+Port);
-				URL = JOptionPane.showInputDialog(null, "Bitte URL eingeben:", "URL??", 0);
-				Port = Integer.parseInt(JOptionPane.showInputDialog(null, "Bitte Port eingeben", "Port:", 0));
-				if (URL.equals("") || Port==0)
+				MultiRequester m = new MultiRequester(new String[]{"URL", "Port"}, new String[]{URL, ""+Port}, "Bitte Port und URL eingeben.");
+				String[] r = m.getResult();
+				if (r==null)
 					System.exit(0);
+				URL = r[0];
+				Port = Integer.parseInt(r[1]);
 				client=null;
 			}
 		}
@@ -63,6 +77,6 @@ public class GUI extends JFrame implements ActionListener
 		if (args.length==3)
 			new GUI(args[0], args[1], Integer.parseInt(args[2]));
 		else
-			new GUI("PeterParker", "localhost", 12346);
+			new GUI("", "", 0);
 	}
 }

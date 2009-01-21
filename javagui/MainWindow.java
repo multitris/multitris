@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import java.util.Random;
 import java.awt.Dimension;
 import java.awt.event.*;
+import common.*;
 
 public class MainWindow extends JFrame
 {
@@ -44,7 +45,7 @@ public class MainWindow extends JFrame
 		gp.COLOR(3, "0000ff");
 		gp.FLUSH();
 		delay(2000);
-		gp.COLOR(4, "000000");
+		gp.COLOR(4, "ffffff");
 		gp.PLAYER(4, "Peter");
 		gp.MESSAGE("Peter joined the Game");
 		gp.FLUSH();
@@ -90,7 +91,13 @@ public class MainWindow extends JFrame
 		MainWindow MW = new MainWindow(gp);
 		gp.SIZE(20,10);//dummy
 		gp.COLOR(1, "ff0000");
-		Client c = new Client(gp, "localhost", 12345);
+		MultiRequester MR = new MultiRequester(new String[]{"URL", "Port"}, 
+												new String[]{"localhost", "12345"},
+												"Bitte Pfad zum Gameserver angeben.");
+		String[] r = MR.getResult();
+		if (r==null)
+			System.exit(0);
+		Client c = new Client(gp, r[0], Integer.parseInt(r[1]));
 		c.loop();
 		demo(gp);
 	}
