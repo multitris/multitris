@@ -8,7 +8,7 @@ public class Player
 	private String name = "Unnamed hero";
 	private int color = -1;
 	private Socket playerSocket = null;
-	private PrintWriter playerSocketOut = null;
+	private OutputStreamWriter playerSocketOut = null;
 	private BufferedReader playerSocketIn = null;
 	private PlayerManager parent = null;
 	private Stone currentStone = null;
@@ -22,7 +22,8 @@ public class Player
 		this.parent = parent;
 		try
 		{
-			this.playerSocketOut = new PrintWriter(playerSocket.getOutputStream());
+			this.playerSocketOut = new OutputStreamWriter(
+                    playerSocket.getOutputStream());
 			this.playerSocketIn = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
 		}
 		catch(Exception e)
@@ -31,7 +32,6 @@ public class Player
 			this.playerSocket = null;
 		}
 	}
-	
 	public int getColor()
 	{
 		return this.color;
@@ -74,6 +74,8 @@ public class Player
 	
 	private String[] splitAtSpaces(String line, int maxSplits)
 	{
+		return line.split(" ",maxSplits);
+		/*
 		String copy = new String(line);
 		String[] result = new String[maxSplits];
 		for(int i=0;i<result.length;i++)
@@ -88,6 +90,7 @@ public class Player
 		
 		result[i] = copy;
 		return result;
+		*/
 	}
 	
 	private void interpreteCommand(String line)
@@ -95,6 +98,7 @@ public class Player
 		if(line.startsWith("NORRIS"))
 		{
 			// whohw, I do not even know how to send a CHUCK but I receive a NORRIS... that's great.
+			sendToClient("CHUCK "+splitAtSpaces(line, 3)[1]);
 		}
 		else if(line.startsWith("IWANTFUN") && ! this.loggedIn)
 		{
@@ -134,7 +138,7 @@ public class Player
 		{
 			try
 			{
-				this.playerSocketOut.println(msg);
+				this.playerSocketOut.write(msg+"\n");
 				this.playerSocketOut.flush();
 			}
 			catch (Exception e)
@@ -224,30 +228,9 @@ public class Player
 		{
 			try
 			{
-				// a complete line?
-				boolean maybeCompleteLinesAvailable = true;
-				
-				while(maybeCompleteLinesAvailable && this.isAlive())
+				while(this.isAlive())
 				{
-					maybeCompleteLinesAvailable = false;
-					if(this.playerSocketIn.ready())
-					{
-						this.playerSocketIn.mark(0);
-						int read = 0;
-						while(read != -1)
-						{
-							read = this.playerSocketIn.read();
-							if(read == (int)('\n'))
-							{
-								maybeCompleteLinesAvailable = true;
-								break;
-							}
-						}
-						this.playerSocketIn.reset();
-						
-						if(maybeCompleteLinesAvailable)
-							this.interpreteCommand(this.playerSocketIn.readLine());
-					}
+					this.interpreteCommand(this.playerSocketIn.readLine());
 				}
 			}
 			catch (Exception e)
