@@ -1,0 +1,86 @@
+Multitris Command Sequences
+===========================
+
+Multitris command sequences, are command's which are exchanged beetween some
+kind of mutlitris server and client. Multitris command sequences are
+transmitted over some kind of connection. With some limitations multitris
+command sequences can be transmitted without connections. This is described
+in paragraph "connectionless multitris command sequences"
+
+Direction
+---------
+
+Multitris command sequences always have a direction. Possible directions are
+client -> server, server -> client, and server <-> client. All obligatory
+commands (except Chuck Norris) may not be send against this direction.
+
+Commands
+--------
+
+Commands are separated by a newline. A newline has the value of 10. A command
+consists of a name and optionally arguments. The command name consists of only
+Uppercase Letters. Uppercase Letters can have the values from 65 which is a
+'A' to 90 which is a 'Z'. Arguments are Separated from the command name and
+from each other by a Space. A Space has the value 32.
+
+Arguments
+---------
+
+Arguments can be Numbers and Strings.
+
+Numbers consist of an option leading Minus and Digits. A Minus has the value
+45. Digits have values from 48 which is a '0' to '57' which is a '9'. Numbers
+are represented in a decimal number system. The '0' represents the 0, the '9'
+represents the 9. The most significant digit comes first. A leading minus
+indicates the Number must be multiplied by -1.
+
+Strings consist of Characters. A Character can be either a Percent followed by
+a Digit or Uppercase Letter followed by a Uppercase Letter or Digit, or a
+value which is not a Percent, a Space, or a Newline. A Percent has the value
+37. The value of a Character which consists of  Percent followed by a Digit or
+Uppercase Letter followed by a Uppercase Letter or Digit, is the value of the
+two Digits or Uppercase Letters interpreted in the hexadecimal number system.
+Therefore the '0' represents a 0 and the 'F' represents a 15. The most
+significant digit comes first.
+
+Optional Commands
+-----------------
+
+Optional Commands can be ignored by the either side. Optional commands can be
+transmitted against the direction. All commands which are not specified as
+obligatory are optional.
+
+Chuck Norris
+------------
+
+Chuck Norris is a commands sequence to check if the other side is alive. The
+side which wants to check transmits a "CHUCK n" command, where n is a Number.
+The other side must answer with a "NORRIS n" command where n is the same n as
+in "CHUCK n". If the other side does not answer in a certain time, the side
+may be considered dead. "CHUCK n" is an obligatory command. "NORRIS n" is an
+optional command. "CHUCK n" is the only obligatory command which can be
+transmitted against the direction.
+
+Connectionless Multitris Command Sequences
+------------------------------------------
+
+This is an extension for Multitris Command Sequences to not be limited to
+connections. Connectionless Mutlitris Command Sequences have some limitations
+and drawbacks. It is not recommended to use Connectionless Multiris Command
+Sequences in setups where Connections are possible.
+
+Commands can be either separated by a Newline or by the package border.
+
+For every Connectionless Multitris Command Sequence Connection a Cookie is
+needed. A Cookie consists of a String. The cookie must be chosen in such a
+way, that nobody can guess the cookie. If supported by the transport protocol,
+the cookie must be exchanged beforehand. Otherwise the command "COOKIE cookie"
+must be transmitted before any other command. The command "COOKIE cookie" is
+only in that case obligatory. If the direction is server <-> client, measures
+must be taken to ensure, only one side sends the COOKIE command. In that case
+it is recommended to only let the server transmit the "COOKIE cookie" command.
+The cookie must be transmitted with every command. If supported by the
+transport protocol, the transport protocol should handle the transmission of
+the cookie. Otherwise each Command Sequence must be preceded by the cookie
+followed by a Space.
+the 
