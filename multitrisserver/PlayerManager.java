@@ -1,5 +1,6 @@
 package multitrisserver;
 import java.net.*;
+import java.nio.channels.*;
 import java.util.LinkedList;
 
 public class PlayerManager implements Runnable
@@ -20,7 +21,11 @@ public class PlayerManager implements Runnable
 		
 		try
 		{
+			//ServerSocketChannel sockChannel = ServerSocketChannel.open();
 			this.sSock = new ServerSocket(port);
+			//this.sSock = sockChannel.socket();
+			//this.sSock.bind(new java.net.InetSocketAddress(port));
+			// sockChannel.configureBlocking(false);
 			new Thread(this).start();
 		}
 		catch(Exception e)
@@ -192,7 +197,9 @@ public class PlayerManager implements Runnable
 	
 	public void playerReady(Player player)
 	{
-		player.setColor(this.generateColor());
+		int hisColor = this.generateColor();
+		player.setColor(hisColor);
+		player.sendToClient("ATTENTION " + this.colors[hisColor] + " " + hisColor);
 		this.nextActivatedPlayers.offer(player);
 		
 		this.parent.playersChanged();

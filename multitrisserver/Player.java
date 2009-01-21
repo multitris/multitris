@@ -8,7 +8,7 @@ public class Player
 	private String name = "Unnamed hero";
 	private int color = -1;
 	private Socket playerSocket = null;
-	private PrintWriter playerSocketOut = null;
+	private OutputStreamWriter playerSocketOut = null;
 	private BufferedReader playerSocketIn = null;
 	private PlayerManager parent = null;
 	private Stone currentStone = null;
@@ -22,7 +22,7 @@ public class Player
 		this.parent = parent;
 		try
 		{
-			this.playerSocketOut = new PrintWriter(playerSocket.getOutputStream());
+			this.playerSocketOut = new OutputStreamWriter(playerSocket.getOutputStream());
 			this.playerSocketIn = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
 		}
 		catch(Exception e)
@@ -74,27 +74,14 @@ public class Player
 	
 	private String[] splitAtSpaces(String line, int maxSplits)
 	{
-		String copy = new String(line);
-		String[] result = new String[maxSplits];
-		for(int i=0;i<result.length;i++)
-			result[i] = null;
-		
-		int i = 0;
-		while(i < (maxSplits-1) && copy.indexOf(' ') != -1)
-		{
-			result[i++] = copy.substring(0, copy.indexOf(' '));
-			copy = copy.substring(copy.indexOf(' ')+1);
-		}
-		
-		result[i] = copy;
-		return result;
+		return line.split(" ",maxSplits);
 	}
 	
 	private void interpreteCommand(String line)
 	{
 		if(line.startsWith("NORRIS"))
 		{
-			// whohw, I do not even know how to send a CHUCK but I receive a NORRIS... that's great.
+			// whohw, I do not even know how to send a CHUCK but I receive a NORRIS... that's great. ingore it
 		}
 		else if(line.startsWith("IWANTFUN") && ! this.loggedIn)
 		{
@@ -134,7 +121,8 @@ public class Player
 		{
 			try
 			{
-				this.playerSocketOut.println(msg);
+				this.playerSocketOut.write(msg);
+				this.playerSocketOut.write("\n");
 				this.playerSocketOut.flush();
 			}
 			catch (Exception e)
@@ -205,7 +193,7 @@ public class Player
 	
 	public boolean isAlive()
 	{
-		return (this.playerSocket != null && this.playerSocket.isConnected());
+		return (this.playerSocket != null && this.playerSocket.isConnected() && ! this.playerSocket.isClosed());
 	}
 	
 	public boolean isReadyForPlaying()
@@ -232,7 +220,7 @@ public class Player
 					maybeCompleteLinesAvailable = false;
 					if(this.playerSocketIn.ready())
 					{
-						this.playerSocketIn.mark(0);
+						this.playerSocketIn.mark(255); // TODO: big commands are cut down, not very beautiful
 						int read = 0;
 						while(read != -1)
 						{

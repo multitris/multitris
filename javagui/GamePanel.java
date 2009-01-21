@@ -32,10 +32,12 @@ public class GamePanel extends JPanel
 		if ((width/vwidth) > (height/vheight))
 		{
 			width=vwidth*(height/vheight);
+			height=vheight*(width/vwidth);
 		}
 		else
 		{
 			height=vheight*(width/vwidth);
+			width=vwidth*(height/vheight);
 		}
 		FLUSH();
 	}
@@ -116,6 +118,8 @@ public class GamePanel extends JPanel
 	}
 	public void SET(int column, int row, int color, String effect)
 	{
+		if (row >= vheight||column>=vwidth ||row<0||column<0)
+			return;
 		if (effect.equals("EXPLODE"))
 			explodingPixels.add(new int[]{column, row});
 		if (color==0)
@@ -177,15 +181,17 @@ public class GamePanel extends JPanel
 		}
 		g.setColor(bgcolor);
 		g.fillRect(0, 0, wwidth, wheight);
+		g.setColor(borderColor);
+		g.drawRect(0, 0, width, height);
 		for (int x=0;x<vwidth;x++)
 			for (int y=0;y<vheight;y++)
 			{
 				if (pixmatrix[x][y]!=null)
 				{
 					g.setColor(pixmatrix[x][y]);
-					g.fillRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (width/vwidth));
+					g.fillRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (height/vheight));
 					g.setColor(borderColor);
-					g.drawRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (width/vwidth));
+					g.drawRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (height/vheight));
 				}
 			}
 		
@@ -200,6 +206,6 @@ public class GamePanel extends JPanel
 		g.setColor(new Color(255,255,255));
 		for (int i=0;i<MAXMESSAGES;i++)
 			if (messages[i]!=null)
-				g.drawString(messages[i], 5, height+10+25*(y++));
+				g.drawString(messages[i], 5, height+15+25*(y++));
 	}
 }
