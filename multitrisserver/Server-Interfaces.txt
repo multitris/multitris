@@ -1,3 +1,7 @@
+//---- POSSIBLY OUTDATED ----
+// please check implementation
+
+
 public class GameLogic
 {
 	private LinkedList<Stone> stones;
@@ -33,3 +37,51 @@ public class Stone
 	public boolean collidesWith(int [][] fixedPixels);
 }
 
+public class Player
+{
+	private int nr;
+	private String name;
+	private int color;
+	private Socket playerSocket;
+	private PlayerManager parent;
+	Stone currentStone;
+	private int points;
+	String protocolId;
+	boolean loggedIn;
+	
+	private interpreteCommand(String line);
+	private sendToClient(String msg);
+	public sendWin();
+	public sendLose();
+	private fuckYou(String msg);
+	public Player(Socket playerSocket, PlayerManager parent);
+	public activate(Stone s);
+	public deactivate(); // send PLONK
+	public boolean isAlive();
+	public boolean isReadyForPlaying(); // isAlive && loggedIn
+	public boolean isPlaying();
+}
+
+public class PlayerManager
+{
+	private LinkedList<Player> players;
+	private String[] colors;
+	private GameLogic parent;
+	
+	public boolean activateNextPlayer(Stone s); // sets color id of this brand-new stone to a free player's color; returns false if there are no free players available. otherwise send 'GOFORREST' to the player and return true
+	public void deactivatePlayer(int col); // deactivates player with the given color (send him a PLONK)
+	
+	public void allPlayersWon();
+	public void allPlayersLost();
+	
+	private void sendToAllClients(String msg);
+	
+	public void playerDied(Player deadPlayer); // called by Player when switching to isAlive=false (connection closed?)
+	
+	public void listGui(GUIServer gui); // tells gui players, points and numbers
+	public void cleanUp(); // removes dead players, reorganizes colors. you should call listGui() afterwards
+	
+	public void goodbyeMyFriends(); // kick all players
+	
+	public void stoneHasPlonked(Stone s); // tell corresponding player his stone has reached the bottom (-> deactivate him)
+}

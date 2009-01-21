@@ -1,5 +1,6 @@
 package multitrisserver;
 import java.util.LinkedList;
+import java.util.Date;
 
 public class GameLogic
 {
@@ -11,14 +12,19 @@ public class GameLogic
 	private FieldObserver fieldObserver; // tell him all changes of the field, and he will be your friend
 	private GUIServer gui;
 	private boolean goOnPlaying=true;
+	private long nextGameStep = 0;
+	private PlayerManager playerManager = null;
 	
 	public GameLogic()
 	{
 		this.stones = new LinkedList<Stone>();
-		this.width = 20; // debug value, should be bigger
-		this.height = 10; // debug value, should be bigger
+		this.width = 30;
+		this.height = 40;
 		
+		System.out.println("Connect your GUI to port 12345, please :)");
 		this.gui = new GUIServer(12345);
+		System.out.println("Thx. Game is started. Clients are welcome: Use port 12346.");
+		this.playerManager = new PlayerManager(this, 12346);
 	}
 	
 	public void startGame()
@@ -36,25 +42,19 @@ public class GameLogic
 		this.gui.SIZE(this.width, this.height);
 		this.gui.RESET(true, true, true, true, true);
 		
-		this.gui.COLOR(1, "ff0000"); // TODO: user, player, points stuff
+		this.playerManager.listGui(this.gui);
 		
-		try {
-			while(this.goOnPlaying)
-			{
-				this.gameStep();
-				this.debug_printField();
-				Thread.sleep(1000);
-			}
-		} catch(Exception e) {System.out.println(e);}
+		this.step(); // here we go
 	}
 	
 	public void shutDown()
 	{
-		this.goOnPlaying = false;
+		this.playerManager.goodbyeMyFriends();
+		this.playerManager.shutDown();
 		this.gui.close();
 	}
 	
-	private void debug_printField() // pseudo-gui, for debugging purposes only
+/*	private void debug_printField() // pseudo-gui, for debugging purposes only
 	{
 		char[][] pixels = new char[this.height][];
 		for(int row=0;row<this.height;row++)
@@ -88,7 +88,7 @@ public class GameLogic
 			System.out.print("\n");
 		}
 		System.out.print("\n");
-	}
+	} */
 	
 	public boolean tryToMoveLeft(Stone s)
 	{
@@ -216,8 +216,30 @@ public class GameLogic
 			}
 		}
 		
-		// TODO: Tell Stone and player it does not exist any more
+		this.playerManager.stoneHasPlonked(s);
 		this.stones.remove(s);
+	}
+	
+	public void step()
+	{
+		if(this.nextGameStep <= (new Date()).getTime())
+		{
+			this.nextGameStep = (new Date()).getTime() + 1000;
+			this.gameStep();
+		}
+		
+		this.playerManager.step();
+		try
+		{
+			Thread.sleep(50);
+		}
+		catch(Exception e)
+		{
+			System.err.println(e);
+		}
+		
+		if(this.goOnPlaying)
+			this.step();
 	}
 	
 	private void gameStep()
@@ -251,7 +273,8 @@ public class GameLogic
 				
 				if(this.validTransformation(tryThisStone, tryThisStone)) // call to see whether it fits
 				{
-					this.insertStone(tryThisStone);
+					if(this.playerManager.activateNextPlayer(tryThisStone))
+						this.insertStone(tryThisStone);
 				}
 			}
 		}
@@ -333,81 +356,28 @@ public class GameLogic
 		this.fieldObserver.flush(this.gui);
 	}
 	
-	public void debug_insertStone(Stone s) // for testing purposes only
+/*	public void debug_insertStone(Stone s) // for testing purposes only
 	{
 		this.insertStone(s);
-	}
+	} */
 	
 	private void gameOver()
 	{
-		this.gui.MESSAGE("Ohhhh you lost");
+		this.gui.MESSAGE("Ohhhh you lost :(");
+		this.playerManager.allPlayersLost();
 		this.goOnPlaying = false; // stop the game
+	}
+	
+	public void playersChanged()
+	{
+		this.playerManager.listGui(this.gui);
 	}
 	
 	public static void main(String[] args)
 	{
-		System.out.println("Connect your GUI, please :)");
-
 		GameLogic GL = new GameLogic();
-		
-		/*boolean[][] matrix = new boolean[][] {{true,true,true},{false,true,false}};
-		Stone s = new Stone(matrix);
-		s.setX(2);
-		s.setY(1);
-		GL.debug_insertStone(s);
-		GL.debug_printField();
-		
-		GL.tryToRotate(s);
-		GL.debug_printField();
-		
-		GL.tryToRotate(s);
-		GL.debug_printField();
-		
-		GL.tryToRotate(s);
-		GL.debug_printField();
-		
-		GL.tryToMoveDown(s);
-		GL.debug_printField();
-		
-		boolean[][] matrix2 = new boolean[][] {{true,true,true},{true,false,true}};
-		Stone second = new Stone(matrix2);
-		
-		second.setX(1);
-		second.setY(2);
-		second.rotate();
-		GL.debug_insertStone(second);
-		
-		GL.debug_printField();
-		
-		boolean[][] matrix3 = new boolean[][] {{true},{true},{true}};
-		Stone balken = new Stone(matrix3);
-		
-		balken.setX(0);
-		balken.setY(-2);
-		
-		// GL.debug_insertStone(balken);
-		
-		boolean[][] pixelmatrix = new boolean[][] {{true}};
-		
-		for(int y=1;y>-14;y-=4)
-		{
-			Stone pixelStone = new Stone(pixelmatrix);
-			pixelStone.setX(0);
-			pixelStone.setY(y);
-			GL.debug_insertStone(pixelStone);
-		}
-		
-		
-		for(int i=4;i<12;i++)
-		{
-			balken = new Stone(matrix3);
-			balken.setX(i);
-			balken.setY(3-(i/3));
-			
-			GL.debug_insertStone(balken);
-		} */
-		
 		GL.startGame();		
 		GL.shutDown();
+		System.out.println("Thanks for playing");
 	}
 }
