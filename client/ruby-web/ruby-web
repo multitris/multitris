@@ -32,47 +32,42 @@ if ARGV.size != 2
 	exit 1
 end
 
+users= Hash.new
+answers= Hash.new
+
 webserver= HTTPServer.new("multitris-web")
 webserver.listen(PORT) do |filename, vars|
-	case filename
-	when "command"
-	when "play"
-		unless vars["form-data"] and vars["form-data"]["username"] and vars["form-data"]["passphrase"]
-			puts vars["form-data"]
-			next HTTPServer::put_file("pages/default.html")
-		end
-	else
-		p= Pathname.new(filename)
-		if (if p= p.basename
-			p= Pathname.new("pages") + p
-		end) and p.file?
-			HTTPServer::put_file(p.to_s)
+	begin
+		case filename
+		when "command"
+			vars["post-data"]=~ /^(\w+) (.*?)$/
+			cookie= $1
+			command= $2
+			if (command=~ /^COOKIE (\w+)$/) # new connection
+				puts command
+				next "ERROR" unless $1 == cookie
+				users[cookie]= Multitris::Client.new
+				users[cookie].connect(ARGV[0], ARGV[1]) do |message|
+					answers[users].call(message) if answers[users]
+				end
+			else
+				next "ERROR" unless users[cookie]
+				case command
+				when /^IWANTFUN [^ ]+ .*?$/
+				when "LAFONTAINE"
+					users[cookie].left
+				when "STOIBER"
+					users[cookie].right
+				when "TURN"
+					users[cookie].turn
+				end
+			end
+			"OK"
 		else
-			HTTPServer::put_file("pages/default.html")
+			HTTPServer::put_file("play.html", "text/html")
 		end
+	rescue
 	end
 end
 client= Multitris::Client.new
-
-control= false
-
-begin
-	client.connect(ARGV[0], ARGV[1]) do |message|
-		case message
-		when "GOFORREST"
-			control= true
-		when "PLONK"
-			control= false
-		when /^ATTENTION (\w\w\w\w\w\w) (\d+)$/
-			puts "You are player number #{$2}"
-			puts "Your color is ##{$1}"
-		else
-			puts message
-		end
-	end
-rescue Errno::ECONNREFUSED
-	STDERR.puts "Connection refused"
-	exit 2
-end
-exit
 

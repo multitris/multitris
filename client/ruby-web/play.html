@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>multitris - playing</title>
+		<style type="text/css">
+			body {
+				background-color: black;
+				color: red;
+			}
+
+			div#messages {
+				padding: 10px;
+				border-color: orange;
+				border-width: 1px;
+				border-style: solid;
+				background-color: #222222;
+			}
+
+		</style>
+		<script type="text/javascript">
+			cookie= parseInt(Math.random()*4294967296);
+			function command(send, func)
+			{
+				var xmlHttp = null;
+				// Mozilla, Opera, Safari sowie Internet Explorer 7
+				if (typeof XMLHttpRequest != 'undefined') {
+					xmlHttp = new XMLHttpRequest();
+				}
+				if (!xmlHttp) {
+					// Internet Explorer 6 und älter
+					try {
+					xmlHttp  = new ActiveXObject("Msxml2.XMLHTTP");
+					} catch(e) {
+					try {
+						xmlHttp  = new ActiveXObject("Microsoft.XMLHTTP");
+					} catch(e) {
+						xmlHttp  = null;
+					}
+					}
+				}
+				if (xmlHttp) {
+					xmlHttp.onreadystatechange = function () {
+						if (xmlHttp.readyState == 4) {
+							func(xmlHttp.responseText);
+						}
+					};
+					xmlHttp.open('POST', '/command');
+					xmlHttp.send(cookie + " " + send);
+				}
+			}
+
+			messages= new Array("", "", "", "", "", "", "", "", "", "");
+			function message(text) {
+				messages.shift();
+				messages.push(text);
+				out= "";
+				for (var i = 0; i < messages.length; ++i)
+					out= out + messages[i] + "<br \/>\n";
+				document.getElementById("messages").innerHTML= out;
+			}
+
+			document.onkeydown= function () {
+				switch(window.event.keyCode) {
+				case 37:
+					command("LAFONTAINE");
+					break;
+				case 39:
+					command("STOIBER");
+					break;
+				}
+			};
+
+			document.onload= function () {
+				message("logging in");
+				command("COOKIE " + cookie);
+				command("IWANTFUN 1.0", function(response) {
+					message("logged in");
+					}
+				);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="messages">
+		</div>
+		<p>
+			use the arrow keys and space to control
+		</p>
+	</body>
+</html>

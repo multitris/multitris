@@ -90,7 +90,9 @@ class HTTPServer
 				vars["form-data"]= HTTPServer.read_multipart(connection, "--#{$1}")
 			when "application/x-www-form-urlencoded"
 				vars["form-data"]= HTTPServer.read_postdata(connection, vars["Content-Length"].to_i)
-			end
+			else 
+				vars["post-data"]= connection.read(vars["Content-Length"].to_i)
+			end if vars["Content-Length"]
 			true
 		end) and stream= block.call(filename, vars)
 			stream= [stream].flatten
@@ -113,7 +115,7 @@ class HTTPServer
 			connection.close
 		else
 			connection.puts("HTTP/1.1 400 Bad Request")
-			connection.puts HTTPServer.header.collect { |name, value| "#{name}: #{value}" }
+			connection.puts header.collect { |name, value| "#{name}: #{value}" }
 			connection.puts
 			connection.close
 		end
@@ -186,9 +188,9 @@ class HTTPServer
 	# Return the return value of HTTPServer.file in the block
 	# given to listen or handle_connection to send the file
 	# filename to the http client.
-	def HTTPServer.put_file(filename)
+	def HTTPServer.put_file(filename, type= nil)
 		vars= Hash.new
-		vars["Content-Type"]= MagicMime.file(filename)
+		vars["Content-Type"]= type || MagicMime.file(filename)
 		vars["Content-Length"]= File.size(filename)
 		return [File.open(filename), vars]
 	end
