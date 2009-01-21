@@ -1,13 +1,8 @@
 package javaclient;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
-import java.util.*;
 public class Client implements Runnable
 {
-	private String url;
-	private int port;
 	private BufferedReader in;
 	private OutputStreamWriter out;
 	private GUI GUI;
@@ -15,9 +10,7 @@ public class Client implements Runnable
 	public Client(String url, int Port, GUI gui) throws Exception
 	{
 		this.GUI=gui;
-		this.url=url;
-		this.port=Port;
-    	Socket cs = new Socket(url, port);
+    	Socket cs = new Socket(url, Port);
         in = new BufferedReader(
                    new InputStreamReader(
                       cs.getInputStream() ) );

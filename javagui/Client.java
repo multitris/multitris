@@ -1,7 +1,6 @@
 package javagui;
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 public class Client 
 {
@@ -108,6 +107,7 @@ public class Client
                    = new BufferedReader(
                        new InputStreamReader(
                           cs.getInputStream() ) );
+            	gp.RESET(false, false, false, false, true);
                 processRequest(in);
                 cs.close();
                 gp.MESSAGE("Server closed connection.");

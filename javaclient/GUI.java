@@ -1,5 +1,6 @@
 package javaclient;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -10,9 +11,9 @@ public class GUI extends JFrame implements ActionListener
 	private JButton bLeft;
 	private JButton bRight;
 	private JButton bTurn;
+	private JPanel	mainPanel;
 	private Client client;
 	private boolean loggedIn;
-	
 	private void delay(int ms)
 	{
 		try
@@ -27,6 +28,21 @@ public class GUI extends JFrame implements ActionListener
 		bLeft.setEnabled(enable);
 		bRight.setEnabled(enable);
 		bTurn.setEnabled(enable);
+	}
+	private Color convertColor(String hexcolor)
+	{
+		try
+		{
+			int r = Integer.parseInt(hexcolor.substring(0, 2), 16);
+			int g = Integer.parseInt(hexcolor.substring(2, 4), 16);
+			int b = Integer.parseInt(hexcolor.substring(4, 6), 16);
+			return new Color(r,g,b);
+		}
+		catch (Exception e)
+		{
+			System.err.println("Der idiot kann keine farben... wir machen schwarz.,");
+			return new Color(0,0,0);
+		}
 	}
 	public GUI(String Name, String URL, int Port)
 	{
@@ -66,10 +82,10 @@ public class GUI extends JFrame implements ActionListener
 		while (!loggedIn)
 			delay(200);
 		
-		JPanel mainPanel = new JPanel();
+		mainPanel = new JPanel();
 		bLeft = new JButton("<-");
 		bRight = new JButton("->");
-		bTurn = new JButton("o");	
+		bTurn = new JButton("o");
 		enableGUI(false);
 		bRight.addActionListener(this);
 		bTurn.addActionListener(this);
@@ -95,6 +111,7 @@ public class GUI extends JFrame implements ActionListener
 		}
 		if (command.equals("ATTENTION"))
 		{
+			//String color = parameter.split(" ",2)[0];
 			loggedIn=true;
 		}
          if(command.equals("CHUCK"))
