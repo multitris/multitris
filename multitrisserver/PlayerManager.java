@@ -21,10 +21,10 @@ public class PlayerManager implements Runnable
 		
 		try
 		{
-			ServerSocketChannel sockChannel = ServerSocketChannel.open();
-			// this.sSock = new ServerSocket(port);
-			this.sSock = sockChannel.socket();
-			this.sSock.bind(new java.net.InetSocketAddress(port));
+			//ServerSocketChannel sockChannel = ServerSocketChannel.open();
+			this.sSock = new ServerSocket(port);
+			//this.sSock = sockChannel.socket();
+			//this.sSock.bind(new java.net.InetSocketAddress(port));
 			// sockChannel.configureBlocking(false);
 			new Thread(this).start();
 		}
