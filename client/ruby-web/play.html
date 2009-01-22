@@ -84,7 +84,7 @@
 			function receive_command(cmd) {
 				if (cmd.substring(0, 9) == "ATTENTION") {
 					if (!login) {
-						login= false;
+						login= true;
 						message("logged in");
 						message("Use the arrow keys and space to play");
 					}
@@ -94,6 +94,10 @@
 					exit();
 				} else if (cmd.substring(0, 5) == "CHUCK") {
 					command("NORRIS " + cmd.substring(6, cmd.length));
+				} else if (cmd == "NOTBAD") {
+					message("You won!");
+				} else if (cmd == "THATWASMISERABLE") {
+					message("You lost");
 				}
 			}
 

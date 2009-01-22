@@ -44,16 +44,19 @@ users= Hash.new
 # look for timeouts
 Thread.new do
 	while true
-		while timeouts.size > 0
-			wait= timeouts[0].time - Time.now
-			sleep wait if wait > 0
-			if timeoutc[timeouts[0].cookie] == timeouts[0].time
-				users[timeouts[0].cookie].pending << "FUCKYOU timeout"
-				users[timeouts[0].cookie].connection.close unless users[timeouts[0].cookie].connection.closed?
+		begin
+			while timeouts.size > 0
+				wait= timeouts[0].time - Time.now
+				sleep wait if wait > 0
+				if timeoutc[timeouts[0].cookie] == timeouts[0].time
+					users[timeouts[0].cookie].pending << "FUCKYOU timeout"
+					users[timeouts[0].cookie].connection.close unless users[timeouts[0].cookie].connection.closed?
+				end
+				timeouts.shift
 			end
-			timeouts.shift
+			sleep 0.1
+		rescue
 		end
-		sleep 0.1
 	end
 end
 
@@ -76,7 +79,7 @@ webserver.listen(PORT) do |filename, vars|
 							user.connection.each do |line|
 								line.strip!
 								case line
-								when /^(CHUCK|ATTENTION) /
+								when /^(CHUCK|ATTENTION|NOTBAD|THATWASMISERABLE) /
 									user.pending << line
 								when /^FUCKYOU/
 									user.pending << line
