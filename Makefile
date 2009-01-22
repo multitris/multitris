@@ -4,7 +4,6 @@ xjavagui:
 	javac javagui/MainWindow.java
 
 xjavaclient:
-
 	javac javaclient/GUI.java
 
 xsnakeserver:
@@ -13,7 +12,7 @@ xsnakeserver:
 xmultitrisserver:
 	make -C multitrisserver
 
-ruby-web
+ruby-web:
 	make -C client/ruby-web
 
 clean:
