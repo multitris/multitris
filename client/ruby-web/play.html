@@ -72,13 +72,18 @@
 				}
 			};
 
-			document.onload= function () {
+			function login() {
 				message("logging in");
-				command("COOKIE " + cookie);
-				command("IWANTFUN 1.0", function(response) {
+				command("IWANTFUN 1.0 player", function(response) {
 					message("logged in");
 					}
 				);
+			}
+
+			document.onload= function () {
+				message("establishing connection");
+				command("COOKIE " + cookie);
+				setTimeout("login()", 1000);
 			}
 		</script>
 	</head>
