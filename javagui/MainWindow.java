@@ -17,15 +17,7 @@ public class MainWindow extends JFrame
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.gp=gp;
 	}
-	public static int rnd(int min, int max)
-	{
-        Random rn = new Random();
-        int n = max - min + 1;
-        int i = rn.nextInt() % n;
-        if (i < 0)
-                i = -i;
-        return min + i;
-	}
+	
 	public static void delay(int ms)
 	{
 		try
@@ -340,7 +332,7 @@ public class MainWindow extends JFrame
 		{
 			for (int x=0;x<100;x++)
 				for(int y=0;y<100;y++)
-					gp.SET(x, y, rnd(0,3), "");
+					gp.SET(x, y, Misc.random(0,3), "");
 			gp.FLUSH();
 			delay(100);
 		}
