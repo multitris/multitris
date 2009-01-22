@@ -55,6 +55,20 @@ public class SnakeServer
 	}
 	public static void main(String[] args) 
 	{	
+		if (args.length>0)
+		{
+			try
+			{
+				int w = Integer.parseInt(args[0]);
+				int h = Integer.parseInt(args[1]);
+				GAMEWIDTH=w;
+				GAMEHEIGHT=h;
+			}
+			catch (Exception e)
+			{
+				System.err.println("Syntax is: SnakeServer <Width> <Height>\n Using standard.");
+			}
+		}
 		Players=new LinkedList<Player>();
 		System.out.println("Please connect GUI to 12345");
 		GUI = new GUIServer(12345);
