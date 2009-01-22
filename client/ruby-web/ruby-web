@@ -21,86 +21,44 @@
 # along with multitris.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-PORT= 1337
 TIMEOUT= 1
 
-require 'socket'
+require 'multitrisclients'
 require 'httpserver'
 require 'timeouts'
-require 'pathname'
 
-if ARGV.size != 2
-	STDERR.puts "usage: ./ruby-web server port"
+if ARGV.size != 3
+	STDERR.puts "usage: ./ruby-web server port webserverport"
 	exit 1
 end
 
-User= Struct.new(:connection, :pending)
-users= Hash.new
-
 timeouts= Timeouts.new(TIMEOUT)
+clients= MultitrisClients.new(ARGV[0], ARGV[1])
+
+def split_input(string)
+	string=~ /^(\w+) (.*?)$/
+		[$1, $2]
+end
+
 
 webserver= HTTPServer.new("multitris-web")
-webserver.listen(PORT) do |filename, vars|
+webserver.listen(ARGV[2]) do |filename, vars|
 	begin
-		case filename
-		when "command"
-			vars["post-data"]=~ /^(\w+) (.*?)$/
-			cookie= $1
-			command= $2
+		if filename=="command"
+			next unless vars["post-data"]
+			cookie, command= split_input(vars["post-data"])
 			if (command=~ /^COOKIE (\w+)$/) # new connection
-				begin
-					next "ERROR" unless $1 == cookie
-					user= User.new()
-					user.connection= TCPSocket.new(ARGV[0], ARGV[1])
-					user.pending= []
-					timeouts.register(cookie) do
-						timeouts.clear(cookie)
-						user.pending << "FUCKYOU timeout"
-						begin
-							user.connection.close
-						rescue IOError
-						end
-					end
-					Thread.new do
-						begin
-							user.connection.each do |line|
-								line.strip!
-								case line
-								when /^(CHUCK|ATTENTION|NOTBAD|THATWASMISERABLE) /
-									user.pending << line
-								when /^FUCKYOU/
-									user.pending << line
-									user.connection.close
-								end
-							end
-							unless user.connection.closed?
-								puts "refused"
-								user.pending<< "FUCKYOU connection unexpectet lost"
-								user.connection.close
-							end
-						rescue
-							unless user.connection.closed?
-								user.pending<< "FUCKYOU connection unexpectet lost"
-								user.connection.close
-							end
-						end
-					end
-					users[cookie]= user
-					""
-				rescue Errno::ECONNREFUSED
-					"FUCKYOU no server found"
+				next "ERROR" unless $1 == cookie
+				clients.userAdd(cookie);
+				timeouts.register(cookie) do
+					timeouts.clear(cookie)
+					clients.userClose(cookie, "timeout")
 				end
 			else
+				next "FUCKYOU no connection found" unless clients.userExists?(cookie)
 				timeouts.reset(cookie)
-				user= users[cookie]
-				next "FUCKYOU no connection found" unless user
-				user.connection.puts command unless command.empty?
-				users.delete(cookie) if user.pending.empty? and user.connection.closed?
-				if user.pending.size > 0
-					user.pending.shift
-				else
-					""
-				end
+				clients.userTransmit(cookie, command) unless command.empty?
+				clients.userReceive(cookie)
 			end
 		else
 			HTTPServer::put_file("play.html", "text/html")
@@ -108,5 +66,4 @@ webserver.listen(PORT) do |filename, vars|
 	rescue
 	end
 end
-client= Multitris::Client.new
 
