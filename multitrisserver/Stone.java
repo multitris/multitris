@@ -129,10 +129,10 @@ public class Stone
 		
 		// rotation of the matrix is not enough; move the rotated stone so that it is rotated around its center
 		
-		int diffY = this.getHeight() - this.getWidth();
-		int diffX = this.getWidth() - this.getHeight();
-		
-		this.move(((diffY)/2), (diffX)/2);
+		if(this.getHeight() > this.getWidth())
+			this.move((this.getWidth()-this.getHeight()-1)/2, (this.getHeight()-this.getWidth()+1)/2);
+		else
+			this.move((this.getWidth()-this.getHeight()+1)/2, (this.getHeight()-this.getWidth()-1)/2);
 	}
 	
 	public boolean collidesWith(Stone b)
