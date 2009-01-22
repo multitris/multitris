@@ -26,6 +26,7 @@ TIMEOUT= 1
 
 require 'socket'
 require 'httpserver'
+require 'timeouts'
 require 'pathname'
 
 if ARGV.size != 2
@@ -33,32 +34,10 @@ if ARGV.size != 2
 	exit 1
 end
 
-Timeout= Struct.new(:cookie, :time)
-timeouts= []
-timeoutc= Hash.new
-
 User= Struct.new(:connection, :pending)
-
 users= Hash.new
 
-# look for timeouts
-Thread.new do
-	while true
-		begin
-			while timeouts.size > 0
-				wait= timeouts[0].time - Time.now
-				sleep wait if wait > 0
-				if timeoutc[timeouts[0].cookie] == timeouts[0].time
-					users[timeouts[0].cookie].pending << "FUCKYOU timeout"
-					users[timeouts[0].cookie].connection.close unless users[timeouts[0].cookie].connection.closed?
-				end
-				timeouts.shift
-			end
-			sleep 0.1
-		rescue
-		end
-	end
-end
+timeouts= Timeouts.new(TIMEOUT)
 
 webserver= HTTPServer.new("multitris-web")
 webserver.listen(PORT) do |filename, vars|
@@ -74,6 +53,14 @@ webserver.listen(PORT) do |filename, vars|
 					user= User.new()
 					user.connection= TCPSocket.new(ARGV[0], ARGV[1])
 					user.pending= []
+					timeouts.register(cookie) do
+						timeouts.clear(cookie)
+						user.pending << "FUCKYOU timeout"
+						begin
+							user.connection.close
+						rescue IOError
+						end
+					end
 					Thread.new do
 						begin
 							user.connection.each do |line|
@@ -104,9 +91,7 @@ webserver.listen(PORT) do |filename, vars|
 					"FUCKYOU no server found"
 				end
 			else
-				tout= Time.now+TIMEOUT
-				timeoutc[cookie]= tout
-				timeouts<< Timeout.new(cookie, tout)
+				timeouts.reset(cookie)
 				user= users[cookie]
 				next "FUCKYOU no connection found" unless user
 				user.connection.puts command unless command.empty?
