@@ -50,6 +50,7 @@ public class GameLogic
 		this.goOnPlaying = true;
 		this.nextGameSpeedIncrease = (new Date()).getTime() + 1000*INCREASESPEEDAFTER;
 		this.fixedPixels = new int[this.height][];
+		this.stones.clear();
 		for(int row=0;row<this.height;row++)
 		{
 			this.fixedPixels[row] = new int[this.width];
@@ -98,6 +99,7 @@ public class GameLogic
 			if(PLAYNUMBEROFGAMES == 0 || (currentGameNo+1)<PLAYNUMBEROFGAMES)
 			{
 				this.gui.MESSAGE("Prepare for the next game, it will start in " + SLEEPBETWEENGAMES + " seconds...");
+				this.gui.FLUSH();
 				for(int secondsWaited=0;secondsWaited<SLEEPBETWEENGAMES;secondsWaited++)
 				{
 					try
