@@ -33,10 +33,10 @@ Version= "1.0"
 		# messages which should be handled by the caller. It
 		# returns the messages the server states as reason
 		# for disconnecting.
-		def connect(server, port)
+		def connect(server, port, player= nil)
 			begin
 				@connection= TCPSocket.new(server, port)
-				@connection.print "IWANTFUN #{Version}\n"
+				@connection.print "IWANTFUN #{Version} #{player or `whoami`.strip}\n"
 				@connection.each do |line|
 					line.strip!
 					case line

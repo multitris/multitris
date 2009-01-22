@@ -35,8 +35,8 @@ JOY_QUIT= 3
 require 'client'
 require 'sdl'
 
-if ARGV.size != 2
-	STDERR.puts "usage: ./sdl-client server port"
+unless (2..3)=== ARGV.size
+	STDERR.puts "usage: ./sdl-client server port [playername]"
 	exit 1
 end
 
@@ -88,7 +88,7 @@ Thread.new do
 end
 
 begin
-	client.connect(ARGV[0], ARGV[1]) do |message|
+	client.connect(ARGV[0], ARGV[1], ARGV[2]) do |message|
 		case message
 		when "GOFORREST"
 			control= true
