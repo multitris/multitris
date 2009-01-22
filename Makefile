@@ -1,9 +1,9 @@
-all: gui client server
+all: gui client-java server
 
 gui:
 	javac javagui/MainWindow.java
 
-client:
+client-java:
 	javac javaclient/GUI.java
 
 server:
