@@ -21,7 +21,7 @@
 		</style>
 		<script type="text/javascript">
 			cookie= parseInt(Math.random()*4294967296);
-			function command(send, func)
+			function command(send)
 			{
 				var xmlHttp = null;
 				// Mozilla, Opera, Safari sowie Internet Explorer 7
@@ -43,7 +43,7 @@
 				if (xmlHttp) {
 					xmlHttp.onreadystatechange = function () {
 						if (xmlHttp.readyState == 4) {
-							func(xmlHttp.responseText);
+							receive_command(xmlHttp.responseText);
 						}
 					};
 					xmlHttp.open('POST', '/command');
@@ -63,27 +63,46 @@
 
 			document.onkeydown= function () {
 				switch(window.event.keyCode) {
+				case 32:
+					command("TURN");
 				case 37:
 					command("LAFONTAINE");
 					break;
 				case 39:
 					command("STOIBER");
 					break;
+				case 40:
+					command("MOELLEMAN");
 				}
 			};
 
-			function login() {
-				message("logging in");
-				command("IWANTFUN 1.0 player", function(response) {
+			function receive_command(cmd) {
+				if (cmd.substring(0, 9) == "ATTENTION") {
 					message("logged in");
-					}
-				);
+					message("Your color is <span style=\"color: " + cmd.substring(11, 16) + ";\">" + cmd.substring(11, 16) + "<\/span>");
+				} else if
+				}
 			}
 
 			document.onload= function () {
+				loaded= true;
 				message("establishing connection");
 				command("COOKIE " + cookie);
-				setTimeout("login()", 1000);
+				setTimeout("login1()", 1000);
+			}
+
+			function login1() {
+				message("<form style=\"display: inline\" onsubmit=\"login2(); return false;\">name: <input type=\"text\" id=\"player_name\" \/><input id=\"login_submit\" type=\"submit\" value=\"login\" \/><\/form>");
+			}
+
+			login= false;
+			function login2() {
+				value= document.getElementById("player_name").value
+				if ((value != "") && (!login)) {
+					login= true;
+					message("logging in");
+					command("IWANTFUN 1.0 "+value);
+				}
 			}
 		</script>
 	</head>
