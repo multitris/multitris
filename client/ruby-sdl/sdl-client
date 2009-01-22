@@ -23,11 +23,15 @@
 
 KEY_LEFT= 276
 KEY_RIGHT= 275
+KEY_UP= 273
+KEY_DOWN= 274
 KEY_TURN= 32
 KEY_QUIT= 27
 
 JOY_LEFT= 7
 JOY_RIGHT= 5
+JOY_UP= 4
+JOY_DOWN= 6
 JOY_TURN= 12
 JOY_QUIT= 3
 
@@ -65,10 +69,12 @@ Thread.new do
 					client.left
 				when KEY_RIGHT
 					client.right
+				when KEY_UP
+					client.up
+				WHEN KEY_DOWN
+					client.down
 				when KEY_TURN
 					client.turn
-				else
-					puts event.sym
 				end
 			when SDL::Event::JoyButtonDown
 				case event.button
@@ -76,10 +82,12 @@ Thread.new do
 					client.left
 				when JOY_RIGHT
 					client.right
+				when JOY_UP
+					client.up
+				WHEN JOY_DOWN
+					client.down
 				when JOY_TURN
 					client.turn
-				else
-					puts event.button
 				end
 			
 			end
