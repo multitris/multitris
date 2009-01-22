@@ -69,6 +69,16 @@ Version= "1.0"
 			@connection.print "STOIBER\n"
 		end
 
+		# Move up.
+		def up
+			@connection.print "MARIHUANA\n"
+		end
+
+		# Move down.
+		def up
+			@connection.print "MOELLEMAN\n"
+		end
+
 		# Turn the tetris block
 		def turn
 			@connection.print "TURN\n"
