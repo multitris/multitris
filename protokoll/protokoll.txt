@@ -1,4 +1,4 @@
-Multitris - Protokoll 1.0
+Multitris - Protokoll 0.1
 
 Server und Client kommunizieren durch Befehle, die durch \n terminiert werden.
 
@@ -25,13 +25,16 @@ NOTBAD
 THATWASMISERABLE
 (in Warte-Phase) Die User haben verloren; Wechsle in LogIn-Phase
 
-
+Alle Server Befehle bis auf Chuck sind optional.
 
 ======= Client-Befehle =======
 
 Nach Verbindungsaufbau sendet der Client die Nachricht
-IWANTFUN x y
-x ist die implementierte Protokollversion (hier 1.0), besteht nur aus nicht-Leerzeichen; y ist benutzerdefinierter Name des Spielers (beliebige Zeichen inkl. Leerzeichen, Zeilenumbruch unzulässig).
+IWANTFUN x[ y]
+x ist die implementierte Protokollversion (hier 1.0), besteht nur aus
+nicht-Leerzeichen; y ist benutzerdefinierter Name des Spielers (beliebige
+Zeichen inkl. Leerzeichen, Zeilenumbruch unzulässig). Um anonym zu spielen,
+lässt der Client y weg.
 Danach ist der Client in der LogIn-Phase, d.h. er wartet darauf dass ein Spiel gestartet wird. An startenden Spielen nimmt der Client automatisch teil, es ist also keine weitere Aktion erforderlich
 
 NORRIS x
@@ -42,6 +45,12 @@ LAFONTAINE
 
 STOIBER
 (in Action-Phase) Das Tetris-Element des Clients soll eine Spalte nach rechts verschoben werden
+
+MOELLEMAN
+(in Action-Phase) Nach unten.
+
+MARIHUANA
+(in Action-Phase) Nach oben.
 
 TURN
 (in Action-Phase) Das Tetris-Element des Clients soll gegen den Uhrzeigersinn gedreht werden; ein Drehen im Uhrzeigersinn ist nicht moeglich
