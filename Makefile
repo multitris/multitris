@@ -4,6 +4,7 @@ xjavagui:
 	javac javagui/MainWindow.java
 
 xjavaclient:
+
 	javac javaclient/GUI.java
 
 xsnakeserver:
