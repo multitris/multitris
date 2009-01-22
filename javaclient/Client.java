@@ -37,15 +37,15 @@ public class Client implements Runnable
            while((first=in.readLine())!=null)
            {
         	   String[] x = first.split(" ", 2);
-        	   if (x.length==1)
+        	   if (x.length<=1)
         		   GUI.networkDataArrived(x[0], "");
         	   else
         		   GUI.networkDataArrived(x[0], x[1]);
            }
         }
-       catch( Exception e )
+       catch( IOException e )
        {
-             System.err.println(e);
+             System.err.println("Error in Client.run():"+e);
         }
     }
 }

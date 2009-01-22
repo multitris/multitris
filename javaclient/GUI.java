@@ -32,23 +32,13 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		bRight.setEnabled(enable);
 		bTurn.setEnabled(enable);
 	}
-	private Color convertColor(String hexcolor)
-	{
-		try
-		{
-			int r = Integer.parseInt(hexcolor.substring(0, 2), 16);
-			int g = Integer.parseInt(hexcolor.substring(2, 4), 16);
-			int b = Integer.parseInt(hexcolor.substring(4, 6), 16);
-			return new Color(r,g,b);
-		}
-		catch (Exception e)
-		{
-			System.err.println("Der idiot kann keine farben... wir machen schwarz.,");
-			return new Color(0,0,0);
-		}
-	}
 	public GUI(String Name, String URL, int Port)
 	{
+		mainPanel = new JPanel();
+		bLeft = new JButton("<-");
+		bRight = new JButton("->");
+		bTurn = new JButton("o");
+		enableGUI(false);
 		if (Name.equals("") || URL.equals("") || Port==0)
 		{
 			MultiRequester m = new MultiRequester(new String[]{"Name", "URL", "Port"}, 
@@ -84,12 +74,6 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		client.sendString("IWANTFUN 1.0 "+Name);
 		while (!loggedIn)
 			delay(200);
-		
-		mainPanel = new JPanel();
-		bLeft = new JButton("<-");
-		bRight = new JButton("->");
-		bTurn = new JButton("o");
-		enableGUI(false);
 		bRight.addActionListener(this);
 		bTurn.addActionListener(this);
 		bLeft.addActionListener(this);
@@ -111,24 +95,24 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		{
 			enableGUI(true);
 		}
-		if (command.equals("PLONK"))
+		else if (command.equals("PLONK"))
 		{
 			enableGUI(false);
 		}
-		if (command.equals("ATTENTION"))
+		else if (command.equals("ATTENTION"))
 		{
 			//String color = parameter.split(" ",2)[0];
 			loggedIn=true;
 		}
-         if(command.equals("CHUCK"))
-         {
-      	   client.sendString("NORRIS "+parameter);
-         }
-         if(command.equals("FUCKYOU"))
-         {
+		else  if(command.equals("CHUCK"))
+	    {
+	  	   client.sendString("NORRIS "+parameter);
+	    }
+		else  if(command.equals("FUCKYOU"))
+        {
       	   JOptionPane.showMessageDialog(this, parameter);
       	   System.exit(0);
-         }
+        }
 	}
 	public void actionPerformed(ActionEvent e) 
 	{

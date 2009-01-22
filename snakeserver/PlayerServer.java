@@ -11,12 +11,10 @@ public class PlayerServer implements Runnable
 {
 	private ServerSocket serverSocket;
 	private boolean isAlive;
-	private LinkedList<Player> playerList;
 	public PlayerServer(int Port, LinkedList<Player> playerList)
 	{
 		try
 		{
-			this.playerList=playerList;
 			serverSocket=new ServerSocket(Port);
 			isAlive=true;
 			new Thread(this).start();
@@ -43,11 +41,8 @@ public class PlayerServer implements Runnable
 				Socket client = serverSocket.accept();
 				BufferedReader in = new BufferedReader(
 						new InputStreamReader(client.getInputStream()));
-				SnakeServer.addPlayer(in, 0, 0);
 				OutputStreamWriter out = new OutputStreamWriter(client.getOutputStream());
-				out.write("ATTENTION\n");
-				out.write("GOFORREST\n");
-				out.flush();
+				new Player(in, out, 0, 0);
 			}
 			catch (java.net.SocketTimeoutException e)
 			{

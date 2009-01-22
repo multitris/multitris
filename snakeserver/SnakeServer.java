@@ -9,69 +9,96 @@ public class SnakeServer
 	public static int GAMEWIDTH = 40;
 	public static int GAMEHEIGHT = 40;
 	private static LinkedList<Player> Players;
-	private static boolean checkCollision(Player p)
+	private static boolean checkCollision(Point p)
 	{
 		for (int i=0;i<Players.size();i++)
 		{
 			Player pp = Players.get(i);
-				LinkedList<Point> pa = p.getPoints();
-				LinkedList<Point> pb = pp.getPoints();
-				for (int ipa=0;ipa<pa.size();ipa++)
-					for (int ipb=0;ipb<pb.size();ipb++)
-						if (pa.get(ipa).equals(pb.get(ipb))&&pa.get(ipa)!=pb.get(ipb))
-							return true;
+			LinkedList<Point> pb = pp.getPoints();
+			for (int ipb=0;ipb<pb.size();ipb++)
+				if (pb.get(ipb).equals(p)&&pb.get(ipb)!=p)
+				{
+					return true;
+				}
 		}
 		return false;
 	}
 	private static GUIServer GUI;
-	public static void addPlayer(BufferedReader in, int x, int y)
+	
+	public static void addPlayer(Player p, String name)
 	{
-		int color=index;
-		String col = Integer.toHexString(1048576 + (int)(Math.random() * 9437184.0));
-		GUI.PLAYER(index, col, "Player "+index);
-		Players.add(new Player(in, x, y, index));
-		System.out.println("Player added.");
+		GUI.PLAYER(index, Misc.generateColor(), name);
+		p.setColor(index);
+		Players.add(p);
+		for (int i=0;i<p.getPoints().size();i++)
+		{
+			GUI.SET(p.getPoints().get(i).x, p.getPoints().get(i).y,p.getColor());
+		}
 		index++;
+	}
+	public static void removePlayer(Player p)
+	{
+		LinkedList<Point> pis = p.getPoints();
+		for(int i=0;i<pis.size();i++)
+		{
+			GUI.SET(pis.get(i).x, pis.get(i).y, 0);
+		}
+		GUI.removePLAYER(p.getColor());
+		p.die();
+		Players.remove(p);
 	}
 	public static void main(String[] args) 
 	{	
 		Players=new LinkedList<Player>();
-		System.out.println("Please connect GUI to 12347");
-		GUI = new GUIServer(12347);
+		System.out.println("Please connect GUI to 12345");
+		GUI = new GUIServer(12345);
 		PlayerServer PS = new PlayerServer(12346, Players);
 		System.out.println("Now Players can connect to 12346");
 		int counter=0;
 		while(true)
 		{
-			counter++;
-			for(int p=0;p<Players.size();p++)
+			if (Players.size()!=0)
 			{
-				Player pl = Players.get(p);
-				pl.doStep();
-				Point rem = pl.removedPoint();
-				Point neu = pl.newPoint();
-				GUI.SET(rem.x, rem.y, 0);
-				GUI.SET(neu.x, neu.y, pl.getColor());
-				if (checkCollision(pl))
+				counter++;
+				for(int p=0;p<Players.size();p++)
 				{
-					LinkedList<Point> pis = pl.getPoints();
-					for(int i=0;i<pis.size();i++)
+					Player pl = Players.get(p);
+					pl.doStep();
+					Point rem = pl.removedPoint();
+					Point neu = pl.newPoint();
+					if (checkCollision(neu))
 					{
-						GUI.SET(pis.get(i).x, pis.get(i).y, 0);
+						GUI.SET(rem.x, rem.y, 0);
+						//Player collision so kill the player...
+						LinkedList<Point> pis = pl.getPoints();
+						for(int i=0;i<pis.size();i++)
+						{
+							GUI.SET(pis.get(i).x, pis.get(i).y, 0);
+						}
+						GUI.removePLAYER(pl.getColor());
+						pl.die();
+						Players.remove(p);
+						p--;
 					}
-					pl.die();
-					Players.remove(p);
-					p--;
+					else
+					{
+						GUI.SET(neu.x, neu.y, pl.getColor());
+						if (counter==10)
+						{
+							pl.getPoints().addFirst(pl.removedPoint());
+							
+						}
+						else
+						{
+							GUI.SET(rem.x, rem.y, 0);
+						}
+					}
 				}
-				if (counter==10)
-				{
-					pl.getPoints().addLast(pl.removedPoint());
-				}
+				GUI.FLUSH();
+				if (counter==100)
+					counter=0;
 			}
-			GUI.FLUSH();
 			Misc.delay(200);
-			if (counter==100)
-				counter=0;
 		}
 	}
 
