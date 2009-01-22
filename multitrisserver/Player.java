@@ -98,7 +98,7 @@ public class Player
 			else
 				this.fuckYou("No fun today.");
 		}
-		else if(line.equals("LAFONTAINE") || line.equals("STOIBER") || line.equals("TURN") || line.equals("MARIHUANA"))
+		else if(line.equals("LAFONTAINE") || line.equals("STOIBER") || line.equals("TURN") || line.equals("MOELLEMANN") || line.equals("MARIHUANA"))
 		{
 			if(this.isPlaying())
 			{
@@ -106,8 +106,10 @@ public class Player
 					this.parent.tryToMoveLeft(this.currentStone);
 				else if(line.equals("STOIBER"))
 					this.parent.tryToMoveRight(this.currentStone);
-				else if(line.equals("MARIHUANA"))
+				else if(line.equals("MOELLEMANN"))
 					this.parent.tryToMoveDown(this.currentStone);
+				else if(line.equals("MARIHUANA"))
+				{ /* no action yet */ }
 				else
 					this.parent.tryToRotate(this.currentStone);
 			}
