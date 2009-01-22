@@ -21,9 +21,9 @@
 # along with multitris.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-PORT= 12345
+PORT= 1337
 
-require 'client'
+require 'socket'
 require 'httpserver'
 require 'pathname'
 
@@ -32,8 +32,9 @@ if ARGV.size != 2
 	exit 1
 end
 
+User= Struct.new(:connection, :pending)
+
 users= Hash.new
-answers= Hash.new
 
 webserver= HTTPServer.new("multitris-web")
 webserver.listen(PORT) do |filename, vars|
@@ -44,25 +45,38 @@ webserver.listen(PORT) do |filename, vars|
 			cookie= $1
 			command= $2
 			if (command=~ /^COOKIE (\w+)$/) # new connection
-				puts command
 				next "ERROR" unless $1 == cookie
-				users[cookie]= Multitris::Client.new
-				users[cookie].connect(ARGV[0], ARGV[1]) do |message|
-					answers[users].call(message) if answers[users]
+				user= User.new()
+				user.connection= TCPSocket.new(ARGV[0], ARGV[1])
+				user.pending= []
+				Thread.new do
+					user.connection.each do |line|
+						line.strip!
+						case line
+						when /^(CHUCK|ATTENTION) /
+							user.pending << line
+						when /^FUCKYOU/
+							user.pending << line
+							user.connection.close
+						end
+					end
+					unless user.connection.closed?
+						user.pending<< "FUCKYOU connection unexpectet lost"
+						user.connection.close
+					end
 				end
+				users[cookie]= user
+				""
 			else
-				next "ERROR" unless users[cookie]
-				case command
-				when /^IWANTFUN [^ ]+ .*?$/
-				when "LAFONTAINE"
-					users[cookie].left
-				when "STOIBER"
-					users[cookie].right
-				when "TURN"
-					users[cookie].turn
+				user= users[cookie]
+				next "FUCKYOU no connection found" unless user
+				user.connection.puts command
+				if user.pending.size > 0
+					user.pending.shift
+				else
+					""
 				end
 			end
-			"OK"
 		else
 			HTTPServer::put_file("play.html", "text/html")
 		end
