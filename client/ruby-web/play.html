@@ -91,9 +91,10 @@
 						message("logged in");
 						message("Use the arrow keys and space to play");
 					}
-					message("Your color is <div style=\"display: inline-block; width: 12px; height: 12px; border-color: white; border-style: solid; border-width: 1px; background-color: " + cmd.substring(10, 16) + "; color: " + cmd.substring(10, 16) + "; \"><\/div>");
+					message("Your color is <div style=\"display: inline-block; width: 12px; height: 12px; border-color: white; border-style: solid; border-width: 1px; background-color: #" + cmd.substring(10, 16) + ";\"><\/div>");
 				} else if (cmd.substring(0, 7) == "FUCKYOU") {
 					message("connection lost: " + cmd.substring (8, cmd.length));
+					message("<form style=\"display: inline;\" onsubmit=\"reconnect(); return false;\"><input id=\"reconnect_submit\" type=\"submit\" value=\"reconnect\" \/><\/form>");
 					exit();
 				} else if (cmd.substring(0, 5) == "CHUCK") {
 					command("NORRIS " + cmd.substring(6, cmd.length));
@@ -110,6 +111,10 @@
 			}
 
 			window.onload= function () {
+				connect();
+			}
+
+			function connect() {
 				message("establishing connection");
 				command("COOKIE " + cookie);
 				setTimeout("login1()", 600);
@@ -138,10 +143,20 @@
 				value= document.getElementById("player_name").value
 				if (value != "") {
 					document.getElementById("player_name").disabled= true;
+					document.getElementById("player_name").id= "";
 					document.getElementById("login_submit").disabled= true;
+					document.getElementById("login_submit").id= "";
+					document.getElementById("messages").focus();
 					message("logging in");
 					command("IWANTFUN 0.1 "+value);
 				}
+			}
+
+			function reconnect() {
+				document.getElementById("reconnect_submit").disabled= true;
+				document.getElementById("reconnect_submit").id= "";
+				end= false;
+				connect();
 			}
 		</script>
 	</head>
