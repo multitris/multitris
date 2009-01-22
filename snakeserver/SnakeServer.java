@@ -27,13 +27,18 @@ public class SnakeServer
 	
 	public static void addPlayer(Player p, String name)
 	{
-		GUI.PLAYER(index, Misc.generateColor(), name);
+		String color = Misc.generateColor();
+		if (name.equals(""))
+			name="Player "+index;
+		GUI.PLAYER(index, color, name);
 		p.setColor(index);
 		Players.add(p);
 		for (int i=0;i<p.getPoints().size();i++)
 		{
 			GUI.SET(p.getPoints().get(i).x, p.getPoints().get(i).y,p.getColor());
 		}
+		p.sendString("ATTENTION "+color+" "+index);
+		p.sendString("GOFORREST");
 		index++;
 	}
 	public static void removePlayer(Player p)
@@ -46,9 +51,24 @@ public class SnakeServer
 		GUI.removePLAYER(p.getColor());
 		p.die();
 		Players.remove(p);
+		GUI.FLUSH();
 	}
 	public static void main(String[] args) 
 	{	
+		if (args.length>0)
+		{
+			try
+			{
+				int w = Integer.parseInt(args[0]);
+				int h = Integer.parseInt(args[1]);
+				GAMEWIDTH=w;
+				GAMEHEIGHT=h;
+			}
+			catch (Exception e)
+			{
+				System.err.println("Syntax is: SnakeServer <Width> <Height>\n Using standard.");
+			}
+		}
 		Players=new LinkedList<Player>();
 		System.out.println("Please connect GUI to 12345");
 		GUI = new GUIServer(12345);
