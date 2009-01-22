@@ -115,29 +115,36 @@ public class Player implements Runnable
 			try
 			{
 				String packet = sockIn.readLine();
-				String command = packet.split(" ", 3)[0];
+				String[] split = packet.split(" ", 3);
+				String command = split[0];
 				if (WartePhase)
 				{
 					if (command.equals("IWANTFUN"))
 					{
-						SnakeServer.addPlayer(this, packet.split(" ", 3)[2]);
-						WartePhase=false;
-						sendString("ATTENTION ff0000 1");
-						sendString("GOFORREST");
+						if (!split[1].equals("0.1"))
+						{
+							sendString("FUCKYOUT Wrong Protocol Version. Current Version is 0.1");
+						}
+						else
+						{
+							if (split.length>=3)
+								SnakeServer.addPlayer(this, split[2]);
+							else
+								SnakeServer.addPlayer(this, "");
+							WartePhase=false;
+						}
 					}
 				}
 				else
 				{
-					int tmpdirection = direction;
 					if (command.equals("STOIBER"))
-						tmpdirection--;
-					if (command.equals("LAFONTAINE"))
-						tmpdirection++;
-					if (tmpdirection==4)
-						tmpdirection=0;
-					if (tmpdirection==-1)
-						tmpdirection=3;
-					direction=tmpdirection;
+						direction = 0;
+					else if (command.equals("MARIHUANA"))
+						direction = 1;
+					else if (command.equals("LAFONTAINE"))
+						direction = 2;
+					else if (command.equals("MOELLEMANN"))
+						direction = 3;
 				}
 			}
 			catch (Exception e)

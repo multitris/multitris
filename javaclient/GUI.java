@@ -1,6 +1,7 @@
 package javaclient;
 
-import java.awt.Color;
+//import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -14,6 +15,8 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 	private JButton bLeft;
 	private JButton bRight;
 	private JButton bTurn;
+	private JButton bUp;
+	private JButton bDown;
 	private JButton bKeyboard;
 	private JPanel	mainPanel;
 	private Client client;
@@ -32,6 +35,8 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		bLeft.setEnabled(enable);
 		bRight.setEnabled(enable);
 		bTurn.setEnabled(enable);
+		bUp.setEnabled(enable);
+		bDown.setEnabled(enable);
 		bKeyboard.setEnabled(enable);
 	}
 	public GUI(String Name, String URL, int Port)
@@ -40,6 +45,8 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		bLeft = new JButton("<-");
 		bRight = new JButton("->");
 		bTurn = new JButton("o");
+		bUp = new JButton("up");
+		bDown = new JButton ("down");
 		bKeyboard = new JButton("KeyboardControl");
                 bKeyboard.addKeyListener(this);
 		enableGUI(false);
@@ -75,16 +82,27 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 				client=null;
 			}
 		}
-		client.sendString("IWANTFUN 1.0 "+Name);
+		if (Name.equals(""))
+			client.sendString("IWANTFUN 0.1");
+		else
+			client.sendString("IWANTFUN 0.1 "+Name);
 		while (!loggedIn)
 			delay(200);
 		bRight.addActionListener(this);
 		bTurn.addActionListener(this);
 		bLeft.addActionListener(this);
+		bUp.addActionListener(this);
+		bDown.addActionListener(this);
+		mainPanel.setLayout(new GridLayout(3,3));
 		this.setSize(200, 100);
+		mainPanel.add(new JPanel());
+		mainPanel.add(bUp);
+		mainPanel.add(new JPanel());
 		mainPanel.add(bLeft);
 		mainPanel.add(bTurn);
 		mainPanel.add(bRight);
+		mainPanel.add(new JPanel());
+		mainPanel.add(bDown);
 		mainPanel.add(bKeyboard);
 		mainPanel.doLayout();
 		this.setContentPane(mainPanel);
@@ -115,14 +133,26 @@ public class GUI extends JFrame implements ActionListener, KeyListener
       	   JOptionPane.showMessageDialog(this, parameter);
       	   System.exit(0);
         }
+		else if(command.equals("NOTBAD"))
+		{
+	      	   JOptionPane.showMessageDialog(this, "Herzlichen Glückwunsch!\n Die Spieler haben gewonnen.");
+	    }
+		else if(command.equals("THATWASMISERABLE"))
+		{
+	      	   JOptionPane.showMessageDialog(this, "Tja,... so ein Pech\n Der Computer hat gewonnen");
+	    }
 	}
 	public void actionPerformed(ActionEvent e) 
 	{
-		if (e.getSource()==bLeft)
+		if (e.getSource()==bUp)
+			client.sendString("MARIHUANA");
+		else if (e.getSource()==bDown)
+			client.sendString("MOELLEMANN");
+		else if (e.getSource()==bLeft)
 			client.sendString("LAFONTAINE");
-		if (e.getSource()==bRight)
+		else if (e.getSource()==bRight)
 			client.sendString("STOIBER");
-		if (e.getSource()==bTurn)
+		else if (e.getSource()==bTurn)
 			client.sendString("TURN");
 	}
 	public static void main(String[] args)
@@ -136,10 +166,14 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 	{
 		if (e.getKeyCode()==java.awt.event.KeyEvent.VK_LEFT)
 			actionPerformed(new ActionEvent(bLeft, 0, "lala"));
-		if (e.getKeyCode()==java.awt.event.KeyEvent.VK_RIGHT)
+		else if (e.getKeyCode()==java.awt.event.KeyEvent.VK_RIGHT)
 			actionPerformed(new ActionEvent(bRight, 0, "lala"));
-		if (e.getKeyCode()==java.awt.event.KeyEvent.VK_SPACE)
+		else if (e.getKeyCode()==java.awt.event.KeyEvent.VK_SPACE)
 			actionPerformed(new ActionEvent(bTurn, 0, "lala"));
+		else if (e.getKeyCode()==java.awt.event.KeyEvent.VK_UP)
+			actionPerformed(new ActionEvent(bUp, 0, "lala"));
+		else if (e.getKeyCode()==java.awt.event.KeyEvent.VK_DOWN)
+			actionPerformed(new ActionEvent(bDown, 0, "lala"));
 	}
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
