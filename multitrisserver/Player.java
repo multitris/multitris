@@ -87,10 +87,10 @@ public class Player
 		else if(line.startsWith("IWANTFUN") && ! this.loggedIn)
 		{
 			String[] parts = this.splitAtSpaces(line, 3);
-			if(parts[1] != null)
+			if(parts.length > 1)
 			{
 				this.protocolId = parts[1];
-				if(parts[2] != null)
+				if(parts.length > 2)
 					this.name = parts[2];
 				this.parent.playerReady(this);
 				this.loggedIn = true;
@@ -142,11 +142,16 @@ public class Player
 			try
 			{
 				this.playerSocketOut.close();
+				this.playerSocketIn.close();
+				this.playerSocket.close();
 				this.playerSocket = null;
 			}
 			catch (Exception e)
 			{
 				System.err.println("4:" +e);
+				this.playerSocket = null;
+				this.playerSocketIn = null;
+				this.playerSocketOut = null;
 			}
 		}
 	}
