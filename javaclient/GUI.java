@@ -14,6 +14,7 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 	private JButton bLeft;
 	private JButton bRight;
 	private JButton bTurn;
+	private JButton bKeyboard;
 	private JPanel	mainPanel;
 	private Client client;
 	private boolean loggedIn;
@@ -31,6 +32,7 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		bLeft.setEnabled(enable);
 		bRight.setEnabled(enable);
 		bTurn.setEnabled(enable);
+		bKeyboard.setEnabled(enable);
 	}
 	public GUI(String Name, String URL, int Port)
 	{
@@ -38,6 +40,8 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		bLeft = new JButton("<-");
 		bRight = new JButton("->");
 		bTurn = new JButton("o");
+		bKeyboard = new JButton("KeyboardControl");
+                bKeyboard.addKeyListener(this);
 		enableGUI(false);
 		if (Name.equals("") || URL.equals("") || Port==0)
 		{
@@ -81,9 +85,7 @@ public class GUI extends JFrame implements ActionListener, KeyListener
 		mainPanel.add(bLeft);
 		mainPanel.add(bTurn);
 		mainPanel.add(bRight);
-		JButton tmp = new JButton("KeyboardControl");
-		tmp.addKeyListener(this);
-		mainPanel.add(tmp);
+		mainPanel.add(bKeyboard);
 		mainPanel.doLayout();
 		this.setContentPane(mainPanel);
 		this.setVisible(true);
