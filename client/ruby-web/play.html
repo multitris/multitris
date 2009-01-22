@@ -18,6 +18,11 @@
 				background-color: #222222;
 			}
 
+			div.message {
+				margin: 0px;
+				padding: 0px;
+			}
+
 		</style>
 		<script type="text/javascript">
 			cookie= parseInt(Math.random()*4294967296);
@@ -51,20 +56,19 @@
 				}
 			}
 
-			messages= new Array("", "", "", "", "", "", "", "", "", "");
 			function message(text) {
-				messages.shift();
-				messages.push(text);
-				out= "";
-				for (var i = 0; i < messages.length; ++i)
-					out= out + messages[i] + "<br \/>\n";
-				document.getElementById("messages").innerHTML= out;
+				div= document.getElementById("messages");
+				div.removeChild(div.firstChild);
+				d= document.createElement("div");
+				d.innerHTML= text;
+				div.appendChild(d);
 			}
 
-			document.onkeydown= function () {
-				switch(window.event.keyCode) {
+			document.onkeydown= function (e) {
+				switch(e.keyCode) {
 				case 32:
 					command("TURN");
+					break;
 				case 37:
 					command("LAFONTAINE");
 					break;
@@ -76,30 +80,58 @@
 				}
 			};
 
+			login= false;
 			function receive_command(cmd) {
 				if (cmd.substring(0, 9) == "ATTENTION") {
-					message("logged in");
-					message("Your color is <span style=\"color: " + cmd.substring(11, 16) + ";\">" + cmd.substring(11, 16) + "<\/span>");
-				} else if
+					if (!login) {
+						login= false;
+						message("logged in");
+						message("Use the arrow keys and space to play");
+					}
+					message("Your color is <div style=\"display: inline-block; width: 12px; height: 12px; border-color: white; border-style: solid; border-width: 1px; background-color: " + cmd.substring(10, 16) + "; color: " + cmd.substring(10, 16) + "; \"><\/div>");
+				} else if (cmd.substring(0, 7) == "FUCKYOU") {
+					message("connection lost: " + cmd.substring (8, cmd.length));
+					exit();
+				} else if (cmd.substring(0, 5) == "CHUCK") {
+					command("NORRIS " + cmd.substring(6, cmd.length));
 				}
 			}
 
-			document.onload= function () {
-				loaded= true;
+			end= false;
+			function exit() {
+				end= true;
+			}
+
+			window.onload= function () {
 				message("establishing connection");
 				command("COOKIE " + cookie);
-				setTimeout("login1()", 1000);
+				setTimeout("login1()", 600);
+				setTimeout("keepalive()", 500);
+			}
+
+			function keepalive() {
+				if (end) {
+					return;
+				}
+				command("");
+				setTimeout("keepalive()", 500);
 			}
 
 			function login1() {
+				if (end) {
+					return;
+				}
 				message("<form style=\"display: inline\" onsubmit=\"login2(); return false;\">name: <input type=\"text\" id=\"player_name\" \/><input id=\"login_submit\" type=\"submit\" value=\"login\" \/><\/form>");
 			}
 
-			login= false;
 			function login2() {
+				if (end) {
+					return;
+				}
 				value= document.getElementById("player_name").value
-				if ((value != "") && (!login)) {
-					login= true;
+				if (value != "") {
+					document.getElementById("player_name").disabled= true;
+					document.getElementById("login_submit").disabled= true;
 					message("logging in");
 					command("IWANTFUN 1.0 "+value);
 				}
@@ -108,9 +140,18 @@
 	</head>
 	<body>
 		<div id="messages">
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
+			<div class="message"></div>
 		</div>
 		<p>
-			use the arrow keys and space to control
 		</p>
 	</body>
 </html>
