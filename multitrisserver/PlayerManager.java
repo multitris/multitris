@@ -11,6 +11,7 @@ public class PlayerManager implements Runnable
 	private GameLogic parent;
 	private ServerSocket sSock = null;
 	private boolean keepOnRunning = true;
+	private int cleanUpTo = 1; // when calling listGui(), this many records will be transmitted (remember this to make sure players are deleted properly)
 	
 	public PlayerManager(GameLogic parent, int port)
 	{
@@ -21,11 +22,7 @@ public class PlayerManager implements Runnable
 		
 		try
 		{
-			//ServerSocketChannel sockChannel = ServerSocketChannel.open();
 			this.sSock = new ServerSocket(port);
-			//this.sSock = sockChannel.socket();
-			//this.sSock.bind(new java.net.InetSocketAddress(port));
-			// sockChannel.configureBlocking(false);
 			new Thread(this).start();
 		}
 		catch(Exception e)
@@ -126,8 +123,19 @@ public class PlayerManager implements Runnable
 	
 	public void listGui(GUIServer gui)
 	{
-		for(int i=1;i<this.colors.length;i++)
+		this.cleanUpTo = (this.colors.length > this.cleanUpTo ? this.colors.length : this.cleanUpTo);
+		
+		for(int i=1;i<this.cleanUpTo;i++)
 		{
+			if(i >= this.colors.length)
+			{
+				// player is definitely dead
+				gui.COLOR(i, "000000");
+				gui.PLAYER(i);
+				gui.POINTS(i, 0);
+				continue;
+			}
+			
 			gui.COLOR(i, this.colors[i]);
 			// does he exist?
 			boolean exists = false;
@@ -183,8 +191,9 @@ public class PlayerManager implements Runnable
 	public void cleanUp()
 	{
 		this.nextActivatedPlayers.clear();
+		this.cleanUpTo = (this.colors.length > this.cleanUpTo ? this.colors.length : this.cleanUpTo);
 		this.colors = new String[] {"kiss me i'm a special value"};
-		
+				
 		for(int i=0;i<this.players.size();i++)
 		{
 			if(! this.players.get(i).isAlive())

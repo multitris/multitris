@@ -32,12 +32,17 @@ public class GUIServer
 		}
 		catch (Exception e)
 		{
-			System.err.println(e);
+			System.err.println("GUI disconnected");
+			System.exit(1);
 		}
 	}
 	public void FLUSH()
 	{
 		sendString("FLUSH");
+	}
+	public void removePLAYER(int idx)
+	{
+		sendString("PLAYER "+idx);
 	}
 	public void PLAYER(int idx, String color, String name)
 	{
