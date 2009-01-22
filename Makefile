@@ -1,20 +1,20 @@
-all: gui client server
+all: xjavaclient xjavagui xsnakeserver xmultitrisserver
 
-gui:
+xjavagui:
 	javac javagui/MainWindow.java
 
-client:
+xjavaclient:
 	javac javaclient/GUI.java
 
-server:
+xsnakeserver:
+	javac snakeserver/SnakeServer.java
+
+xmultitrisserver:
 	make -C multitrisserver
 
-ruby-web:
-	make -C client/ruby-web
-
 clean:
+	rm -f javagui/*.class
 	rm -f javaclient/*.class
 	rm -f common/*.class
-	make -C client/ruby-web clean
-	rm -f javagui/*.class
+	rm -f snakeserver/*.class
 	make -C multitrisserver clean
