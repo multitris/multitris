@@ -24,7 +24,7 @@ require 'socket'
 
 module Multitris
 
-Version= "1.0"
+Version= "0.1"
 
 	# A Multitris client
 	class Client
