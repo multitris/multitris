@@ -82,42 +82,45 @@ class HTTPServer
 	# the http body. In case of nil the http status code will be
 	# "404 Bad Request".
 	def handle_connection(connection, &block)
-		if (if connection.readline.strip=~ /^(GET|POST) \/(.*?) HTTP\/1.[01]$/
-			filename= $2
-			vars= HTTPServer.read_vars(connection)
-			case vars["Content-Type"]
-			when /^multipart\/form-data;\s+boundary=(.+?)$/
-				vars["form-data"]= HTTPServer.read_multipart(connection, "--#{$1}")
-			when "application/x-www-form-urlencoded"
-				vars["form-data"]= HTTPServer.read_postdata(connection, vars["Content-Length"].to_i)
-			else 
-				vars["post-data"]= connection.read(vars["Content-Length"].to_i)
-			end if vars["Content-Length"]
-			true
-		end) and stream= block.call(filename, vars)
-			stream= [stream].flatten
-			status= ((stream.size == 3 and stream.pop) or "200 OK")
-			vars= ((stream.size == 2 and stream.pop) or Hash.new)
-			stream= stream[0]
-			connection.puts "HTTP/1.1 #{status}"
-			connection.puts header.collect { |name, value| "#{name}: #{value}" }
-			connection.puts vars.collect { |name, value| "#{name}: #{value}" }
-			connection.puts "Connection: close"
-			connection.puts
-			case stream
-			when File
-				IO2IO.sendfile(stream.to_i, connection.to_i, (vars["Content-Length"] or -1))
-			when IO
-				IO2IO.forever(stream.to_i, connection.to_i)
-			when String
-				connection.write stream
+		begin
+			if (if connection.readline.strip=~ /^(GET|POST) \/(.*?) HTTP\/1.[01]$/
+				filename= $2
+				vars= HTTPServer.read_vars(connection)
+				case vars["Content-Type"]
+				when /^multipart\/form-data;\s+boundary=(.+?)$/
+					vars["form-data"]= HTTPServer.read_multipart(connection, "--#{$1}")
+				when "application/x-www-form-urlencoded"
+					vars["form-data"]= HTTPServer.read_postdata(connection, vars["Content-Length"].to_i)
+				else 
+					vars["post-data"]= connection.read(vars["Content-Length"].to_i)
+				end if vars["Content-Length"]
+				true
+			end) and stream= block.call(filename, vars)
+				stream= [stream].flatten
+				status= ((stream.size == 3 and stream.pop) or "200 OK")
+				vars= ((stream.size == 2 and stream.pop) or Hash.new)
+				stream= stream[0]
+				connection.puts "HTTP/1.1 #{status}"
+				connection.puts header.collect { |name, value| "#{name}: #{value}" }
+				connection.puts vars.collect { |name, value| "#{name}: #{value}" }
+				connection.puts "Connection: close"
+				connection.puts
+				case stream
+				when File
+					IO2IO.sendfile(stream.to_i, connection.to_i, (vars["Content-Length"] or -1))
+				when IO
+					IO2IO.forever(stream.to_i, connection.to_i)
+				when String
+					connection.write stream
+				end
+				connection.close
+			else
+				connection.puts("HTTP/1.1 400 Bad Request")
+				connection.puts header.collect { |name, value| "#{name}: #{value}" }
+				connection.puts
+				connection.close
 			end
-			connection.close
-		else
-			connection.puts("HTTP/1.1 400 Bad Request")
-			connection.puts header.collect { |name, value| "#{name}: #{value}" }
-			connection.puts
-			connection.close
+		rescue
 		end
 	end
 
