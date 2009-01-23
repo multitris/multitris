@@ -71,7 +71,7 @@ Thread.new do
 					client.right
 				when KEY_UP
 					client.up
-				WHEN KEY_DOWN
+				when KEY_DOWN
 					client.down
 				when KEY_TURN
 					client.turn
@@ -84,7 +84,7 @@ Thread.new do
 					client.right
 				when JOY_UP
 					client.up
-				WHEN JOY_DOWN
+				when JOY_DOWN
 					client.down
 				when JOY_TURN
 					client.turn
