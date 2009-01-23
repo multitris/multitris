@@ -48,7 +48,7 @@ class MultitrisClients
 
 	def userReceive(cookie)
 		result= @queues[cookie].shift || ""
-		if @connections[cookie] and @connections[cookie].closed? and @queues[cookie].size == 0
+		if @connections[cookie] and @connections[cookie].closed? and @queues[cookie] and @queues[cookie].size == 0
 			@connections.delete(cookie)
 			@queues.delete(cookie)
 		end
@@ -56,7 +56,8 @@ class MultitrisClients
 	end
 
 	def userClose(cookie, reason= "")
-		@queues[cookie]= ["FUCKYOU " + reason]
+		queue= @queues[cookie]
+		queue<< "FUCKYOU " + reason
 		begin # FUCKYOU before close, so other threads won't delete this user to early
 			@connections[cookie].close if @connections[cookie]
 		rescue IOError

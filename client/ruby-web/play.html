@@ -122,10 +122,18 @@
 			};
 
 			login= false;
+			connection= false;
 			function receive_command(cmd) {
-				document.getElementById("reconnect_submit").blur();
-				document.getElementById("reconnect_submit").disabled= true;
-				document.getElementById("reconnect_submit").id= "";
+				if (document.getElementById("reconnect_submit")) {
+					document.getElementById("reconnect_submit").blur();
+					document.getElementById("reconnect_submit").disabled= true;
+					document.getElementById("reconnect_submit").id= "";
+				}
+				if ((!connection) && (cmd.substring(0,7) != "FUCKYOU")) {
+					setTimeout("keepalive()", 500);
+					login1();
+					connection= true;
+				}
 				if (cmd.substring(0, 9) == "ATTENTION") {
 					if (!login) {
 						login= true;
@@ -147,11 +155,14 @@
 
 			end= false;
 			function exit() {
-				document.getElementById("reconnect_submit").blur();
-				document.getElementById("reconnect_submit").disabled= true;
-				document.getElementById("reconnect_submit").id= "";
+				if (document.getElementById("reconnect_submit")) {
+					document.getElementById("reconnect_submit").blur();
+					document.getElementById("reconnect_submit").disabled= true;
+					document.getElementById("reconnect_submit").id= "";
+				}
 				message("<form onsubmit=\"reconnect(); return false;\"><input id=\"reconnect_submit\" type=\"submit\" value=\"reconnect\" \/><\/form>");
 				end= true;
+				connection= false;
 			}
 
 			window.onload= function () {
@@ -162,8 +173,6 @@
 				message("establishing connection");
 				document.getElementById("disconnect_submit").disabled= false;
 				command("COOKIE " + cookie);
-				setTimeout("login1()", 600);
-				setTimeout("keepalive()", 500);
 			}
 
 			function keepalive() {
