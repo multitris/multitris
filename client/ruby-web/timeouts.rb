@@ -18,7 +18,8 @@ class Timeouts
 						sleep wait # wait for the timeout
 					else
 						if @times[name] and (@times[name] < Time.now)
-							@blocks[name].call()
+							block= @blocks[name] # ensure no other thread deleted it before calling
+							block.call if block
 						end
 						@sleeps.shift
 					end
