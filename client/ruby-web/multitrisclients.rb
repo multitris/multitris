@@ -24,7 +24,8 @@ class MultitrisClients
 					if line=~ /^FUCKYOU( (.*?))?$/
 						userClose(cookie, $2 || "");
 					else
-						@queues[cookie] << line
+						queue= @queues[cookie]
+						queue<< line
 					end
 				end
 			rescue
