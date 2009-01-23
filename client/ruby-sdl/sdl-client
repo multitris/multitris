@@ -54,6 +54,23 @@ client= Multitris::Client.new
 
 control= false
 
+$key_repeat= nil
+
+def key_repeat_stop
+	$key_repeat.exit if $key_repeat
+	$key_repeat= nil
+end
+
+def key_repeat_start(&block)
+	$key_repeat= Thread.new do
+		sleep 0.2
+		loop do
+			block.call
+			sleep 0.05
+		end
+	end
+end
+
 Thread.new do
 	loop do
 		while event=SDL::Event.poll
@@ -62,36 +79,48 @@ Thread.new do
 				exit
 			end
 			next unless control
-			case event
+			block= case event
+			when SDL::Event::KeyUp
+				key_repeat_stop
+				nil
+			when SDL::Event::JoyButtonUp
+				key_repeat_stop
+				nil
 			when SDL::Event::KeyDown
+				key_repeat_stop
 				case event.sym
 				when KEY_LEFT
-					client.left
+					lambda { client.left }
 				when KEY_RIGHT
-					client.right
+					lambda { client.right }
 				when KEY_UP
-					client.up
+					lambda { client.up }
 				when KEY_DOWN
-					client.down
+					lambda { client.down }
 				when KEY_TURN
-					client.turn
+					lambda { client.turn }
 				end
 			when SDL::Event::JoyButtonDown
+				key_repeat_stop
 				case event.button
 				when JOY_LEFT
-					client.left
+					lambda { client.left }
 				when JOY_RIGHT
-					client.right
+					lambda { client.right }
 				when JOY_UP
-					client.up
+					lambda { client.up }
 				when JOY_DOWN
-					client.down
+					lambda { client.down }
 				when JOY_TURN
-					client.turn
+					lambda { client.turn }
 				end
-			
+			end
+			if block
+				block.call
+				key_repeat_start(&block)
 			end
 		end
+		sleep 0.01
 	end
 end
 

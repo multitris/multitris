@@ -75,7 +75,7 @@ Version= "0.1"
 		end
 
 		# Move down.
-		def up
+		def down
 			@connection.print "MOELLEMANN\n"
 		end
 
