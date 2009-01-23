@@ -46,7 +46,7 @@ LAFONTAINE
 STOIBER
 (in Action-Phase) Das Tetris-Element des Clients soll eine Spalte nach rechts verschoben werden
 
-MOELLEMAN
+MOELLEMANN
 (in Action-Phase) Nach unten.
 
 MARIHUANA

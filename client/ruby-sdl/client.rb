@@ -76,7 +76,7 @@ Version= "0.1"
 
 		# Move down.
 		def up
-			@connection.print "MOELLEMAN\n"
+			@connection.print "MOELLEMANN\n"
 		end
 
 		# Turn the tetris block
