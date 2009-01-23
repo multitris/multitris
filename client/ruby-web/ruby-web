@@ -48,12 +48,13 @@ webserver.listen(ARGV[2]) do |filename, vars|
 			next unless vars["post-data"]
 			cookie, command= split_input(vars["post-data"])
 			if (command=~ /^COOKIE (\w+)$/) # new connection
-				next "ERROR" unless $1 == cookie
+				next "FUCKYOU invalid cookie" unless $1 == cookie
 				clients.userAdd(cookie);
 				timeouts.register(cookie) do
 					timeouts.clear(cookie)
 					clients.userClose(cookie, "timeout")
 				end
+				clients.userReceive(cookie)
 			else
 				next "FUCKYOU no connection found" unless clients.userExists?(cookie)
 				timeouts.reset(cookie)
