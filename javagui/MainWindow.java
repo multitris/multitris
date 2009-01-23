@@ -344,19 +344,33 @@ public class MainWindow extends JFrame implements Runnable
 		MainWindow MW = new MainWindow(gp);
 		gp.SIZE(20,10);//dummy
 		gp.COLOR(1, "ff0000");
-		MultiRequester MR = new MultiRequester(new String[]{"URL", "Port"}, 
+		if (args.length==0)
+		{
+			MultiRequester MR = new MultiRequester(new String[]{"URL", "Port"}, 
 												new String[]{"localhost", "12345"},
 												"Bitte Pfad zum Gameserver angeben.");
-		String[] r = MR.getResult();
-		if (r==null)
+			args = MR.getResult();
+		}
+		String URL="";
+		int Port=0;
+		try
+		{
+			URL = args[0];
+			Port = Integer.parseInt(args[1]);
+		}
+		catch(Exception e)
+		{
+			if (args!=null)
+				System.out.println("Syntax is javagui.MainWindow[ <URL> <Port>]");
 			System.exit(0);
+		}
 		Thread DemoThread=new Thread(MW);
 		DemoThread.start();
 		while (true)
 		{
 			if(DemoThread.getState()==Thread.State.TERMINATED)
 				(DemoThread=new Thread(MW)).start();
-			Client c = new Client(gp, r[0], Integer.parseInt(r[1]));
+			Client c = new Client(gp, URL, Port);
 			c.loop(DemoThread);
 			Misc.delay(3000);
 		}
