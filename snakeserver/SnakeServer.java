@@ -8,6 +8,8 @@ public class SnakeServer
 	public static int index=1;
 	public static int GAMEWIDTH = 40;
 	public static int GAMEHEIGHT = 40;
+	public static int GameServerPort = 12346;
+	public static int GUIServerPort = 12345;
 	private static LinkedList<Player> Players;
 	private static boolean checkCollision(Point p)
 	{
@@ -24,7 +26,21 @@ public class SnakeServer
 		return false;
 	}
 	private static GUIServer GUI;
-	
+	public static void sendError(String s)
+	{
+		System.err.println("Error will be send to everybody connected:"+s);
+		for (int i=0;i<Players.size();i++)
+		{
+			if (Players.get(i).connected())
+				Players.get(i).sendString("FUCKYOU "+s);
+		}
+		if (GUI.connected())
+		{
+			GUI.MESSAGE("Error: "+s);
+			GUI.FLUSH();
+		}
+		System.exit(0);
+	}
 	public static void addPlayer(Player p, String name)
 	{
 		String color = Misc.generateColor();
@@ -55,25 +71,45 @@ public class SnakeServer
 	}
 	public static void main(String[] args) 
 	{	
-		if (args.length>0)
+		try
 		{
-			try
+			for(int i=0;i<args.length;i++)
 			{
-				int w = Integer.parseInt(args[0]);
-				int h = Integer.parseInt(args[1]);
-				GAMEWIDTH=w;
-				GAMEHEIGHT=h;
-			}
-			catch (Exception e)
-			{
-				System.err.println("Syntax is: SnakeServer <Width> <Height>\n Using standard.");
+				if (args[i].equals("-s"))
+				{
+					GAMEWIDTH = Integer.parseInt(args[++i]);
+					GAMEHEIGHT = Integer.parseInt(args[i]);
+					continue;
+				}
+				if (args[i].equals("-p"))
+				{
+					GameServerPort = Integer.parseInt(args[++i]);
+					continue;
+				}
+				if (args[i].equals("-P"))
+				{
+					GUIServerPort = Integer.parseInt(args[++i]);
+					continue;
+				}
+				if (args[i].equals("-h"))
+				{
+					System.err.println("Syntax is: SnakeServer [-s <width> <height>] [-p <GameServerPort>] [-P <GUIServerPort>");
+					System.exit(0);
+				}
 			}
 		}
+		catch (Exception e)
+		{
+			System.err.println("Syntax is: SnakeServer [-s <width> <height>] [-p <GameServerPort>] [-P <GUIServerPort>");
+			System.exit(0);
+		}
 		Players=new LinkedList<Player>();
-		System.out.println("Please connect GUI to 12345");
-		GUI = new GUIServer(12345);
-		PlayerServer PS = new PlayerServer(12346, Players);
-		System.out.println("Now Players can connect to 12346");
+		System.out.println("Please connect GUI to "+GUIServerPort);
+		GUI = new GUIServer(GUIServerPort);
+		PlayerServer PS = new PlayerServer(GameServerPort, Players);
+		System.out.println("Now Players can connect to "+GameServerPort);
+		GUI.MESSAGE("Welcome to Multi-Snake!!");
+		GUI.MESSAGE("Now Players can connect to port: "+GameServerPort);
 		int counter=0;
 		while(true)
 		{
@@ -114,10 +150,10 @@ public class SnakeServer
 						}
 					}
 				}
-				GUI.FLUSH();
 				if (counter==100)
 					counter=0;
 			}
+			GUI.FLUSH();//so we can detect GUI disconnection even if no Player connected...
 			Misc.delay(200);
 		}
 	}
