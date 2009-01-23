@@ -18,6 +18,10 @@
 				background-color: #222222;
 			}
 
+			form {
+				display: inline;
+			}
+
 		</style>
 		<script type="text/javascript">
 			cookie= parseInt(Math.random()*4294967296);
@@ -59,22 +63,61 @@
 				div.appendChild(d);
 			}
 
+			key_repeat_enabled= true;
+			key_repeat= false;
+			key_repeat_timer= false;
 			document.onkeydown= function (e) {
-				switch(e.keyCode) {
+				key_repeat= false;
+				clearTimeout(key_repeat_timer);
+				str= key_to_str(e.keyCode);
+				if (str != "") {
+					if (key_repeat_enabled) {
+						key_repeat= str;
+					}
+					key_repeat_timer= setTimeout("repeatKey()", 200);
+					command(str);
+				}
+			}
+
+			document.onkeyup= function (e) {
+				key_repeat= false;
+				clearTimeout(key_repeat_timer);
+			}
+			
+			function repeatKey() {
+				if (key_repeat) {
+					key_repeat_timer= setTimeout("repeatKey()", 50);
+					command(key_repeat);
+				}
+			}
+
+			function setKeyRepeat() {
+				key_repeat_enabled= document.getElementById("key-repeat").checked;
+				if (!key_repeat_enabled) {
+					key_repeat= false;
+					clearTimeout(key_repeat_timer);
+				}
+			}
+
+			function key_to_str(key) {
+				switch(key) {
 				case 32:
-					command("TURN");
+					return "TURN";
 					break;
 				case 37:
-					command("LAFONTAINE");
+					return "LAFONTAINE";
 					break;
 				case 38:
-					command("MARIHUANA");
+					return "MARIHUANA";
 					break;
 				case 39:
-					command("STOIBER");
+					return "STOIBER";
 					break;
 				case 40:
-					command("MOELLEMANN");
+					return "MOELLEMANN";
+					break;
+				default:
+					return ""
 				}
 			};
 
@@ -89,7 +132,6 @@
 					message("Your color is <div style=\"display: inline-block; width: 12px; height: 12px; border-color: white; border-style: solid; border-width: 1px; background-color: #" + cmd.substring(10, 16) + ";\"><\/div>");
 				} else if (cmd.substring(0, 7) == "FUCKYOU") {
 					message("connection lost: " + cmd.substring (8, cmd.length));
-					message("<form style=\"display: inline;\" onsubmit=\"reconnect(); return false;\"><input id=\"reconnect_submit\" type=\"submit\" value=\"reconnect\" \/><\/form>");
 					exit();
 				} else if (cmd.substring(0, 5) == "CHUCK") {
 					command("NORRIS " + cmd.substring(6, cmd.length));
@@ -102,6 +144,7 @@
 
 			end= false;
 			function exit() {
+				message("<form onsubmit=\"reconnect(); return false;\"><input id=\"reconnect_submit\" type=\"submit\" value=\"reconnect\" \/><\/form>");
 				end= true;
 			}
 
@@ -111,6 +154,7 @@
 
 			function connect() {
 				message("establishing connection");
+				document.getElementById("disconnect_submit").disabled= false;
 				command("COOKIE " + cookie);
 				setTimeout("login1()", 600);
 				setTimeout("keepalive()", 500);
@@ -128,7 +172,7 @@
 				if (end) {
 					return;
 				}
-				message("<form style=\"display: inline\" onsubmit=\"login2(); return false;\">name: <input type=\"text\" id=\"player_name\" \/><input id=\"login_submit\" type=\"submit\" value=\"login\" \/><\/form>");
+				message("<form onsubmit=\"login2(); return false;\">name: <input type=\"text\" id=\"player_name\" \/><input id=\"login_submit\" type=\"submit\" value=\"login\" \/><\/form>");
 			}
 
 			function login2() {
@@ -156,6 +200,13 @@
 				end= false;
 				connect();
 			}
+
+			function disconnect() {
+				document.getElementById("disconnect_submit").blur();
+				document.getElementById("disconnect_submit").disabled= true;
+				message("disconnected");
+				exit();
+			}
 		</script>
 	</head>
 	<body>
@@ -167,7 +218,9 @@
 			<div id="4"></div>
 			<div id="5"></div>
 		</div>
-		<p>
-		</p>
+		<div>
+			<form>key-repeat: <input id="key-repeat" onclick="setKeyRepeat()" type="checkbox" checked="checked" /></form>
+			<form onsubmit="disconnect(); return false" ><input id="disconnect_submit" type="submit" value="disconnect" disabled="disabled" /></form>
+		</div>
 	</body>
 </html>
