@@ -32,10 +32,31 @@ public class Misc
 	}
 	/**
 	 * Generates a random Color in Hex-Format like ff0023
+	 * (In fact uses a predefined list of colors until end is reached
+	 * and then is generates random colors. You're welcome to adapt your
+	 * favorite colors here ;)
 	 */
+	private static int lastColorIndex=0;
 	public static String generateColor()
 	{
-		return Integer.toHexString(1048576 + (int)(Math.random() * 9437184.0));
+		String color="";
+		switch (lastColorIndex)
+		{
+			//here you can define the first colors
+			case 0:{color="ff0000";break;}
+			case 1:{color="00ff00";break;}
+			case 2:{color="0000ff";break;}
+			case 3:{color="ff00ff";break;}
+			case 4:{color="f0f0f0";break;}
+			//every other color will be random.(=bad)
+			default:
+			{
+				color=Integer.toHexString(1048576 + (int)(Math.random() * 9437184.0));
+				break;
+			}
+		}
+		lastColorIndex++;
+		return color;
 	}
 	/**
 	 * Blocks the Program for a given Time (and handles the Exception)
@@ -67,6 +88,11 @@ public class Misc
                 i = -i;
         return min + i;
 	}
+	/**
+	 * generates a random int number between 0 and the given Max value
+	 * @param max
+	 * @return
+	 */
 	public static int random(int max)
 	{
 		return random(0, max);

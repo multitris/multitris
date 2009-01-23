@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import common.*;
 
-public class MainWindow extends JFrame
+public class MainWindow extends JFrame implements Runnable
 {
 	private GamePanel gp;
 	public MainWindow(GamePanel gp)
@@ -17,7 +17,6 @@ public class MainWindow extends JFrame
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.gp=gp;
 	}
-	
 	public static void delay(int ms)
 	{
 		try
@@ -286,7 +285,7 @@ public class MainWindow extends JFrame
 		for (int c=0;c<ca.length;c++)//c++ ha ha ha.... man kann also in Java C++ schreiben,....
 			drawChar(x+6*c, y, ca[c], color, gp);
 	}
-	public static void demo(GamePanel gp)
+	public void run()
 	{
 		gp.RESET(true, true, true, true, true);
 		gp.SIZE(100,100);
@@ -351,8 +350,15 @@ public class MainWindow extends JFrame
 		String[] r = MR.getResult();
 		if (r==null)
 			System.exit(0);
-		Client c = new Client(gp, r[0], Integer.parseInt(r[1]));
-		c.loop();
-		demo(gp);
+		Thread DemoThread=new Thread(MW);
+		DemoThread.start();
+		while (true)
+		{
+			if(DemoThread.getState()==Thread.State.TERMINATED)
+				(DemoThread=new Thread(MW)).start();
+			Client c = new Client(gp, r[0], Integer.parseInt(r[1]));
+			c.loop(DemoThread);
+			Misc.delay(3000);
+		}
 	}
 }
