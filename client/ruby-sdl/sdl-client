@@ -55,6 +55,40 @@ client= Multitris::Client.new
 control= false
 
 $key_repeat= nil
+$joy_up= 0
+$joy_left= 0
+
+Thread.new do
+	loop do
+		i= 0
+		while (i<0.51-(0.5 * $joy_up).abs)
+			sleep 0.01
+			i+= 0.01
+		end
+		next unless control
+		if $joy_up < 0
+			client.up
+		elsif $joy_up > 0
+			client.down
+		end
+	end
+end
+
+Thread.new do
+	loop do
+		i= 0
+		while (i<0.51-(0.5 * $joy_left).abs)
+			sleep 0.01
+			i+= 0.01
+		end
+		next unless control
+		if $joy_left < 0
+			client.left
+		elsif $joy_left > 0
+			client.right
+		end
+	end
+end
 
 def key_repeat_stop
 	$key_repeat.exit if $key_repeat
@@ -114,13 +148,20 @@ Thread.new do
 				when JOY_TURN
 					lambda { client.turn }
 				end
+			when SDL::Event::JoyAxis
+				case event.axis
+				when 0
+					$joy_left= 1.0 * event.value / 32768
+				when 1
+					$joy_up= 1.0 * event.value / 32768
+				end
+				nil
 			end
 			if block
 				block.call
 				key_repeat_start(&block)
 			end
 		end
-		sleep 0.01
 	end
 end
 
@@ -131,6 +172,7 @@ begin
 			control= true
 		when "PLONK"
 			control= false
+			key_repeat_stop
 		when /^ATTENTION (\w\w\w\w\w\w) (\d+)$/
 			puts "You are player number #{$2}"
 			puts "Your color is ##{$1}"
