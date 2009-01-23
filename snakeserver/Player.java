@@ -15,8 +15,12 @@ public class Player implements Runnable
 	private boolean isAlive;
 	private int direction;
 	private int color;
+	private boolean connected;
 	private OutputStreamWriter out;
-	
+	public boolean connected()
+	{
+		return connected;
+	}
 	public void sendString(String s)
 	{
 		try
@@ -26,12 +30,13 @@ public class Player implements Runnable
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error sendingString in Player.sendString: "+e);
+			System.err.println("Error sendingString in Player.sendString: "+e);
 		}
 	}
 	public void die()
 	{
 		isAlive=false;
+		connected=false;
 		sendString("FUCKYOU You sucked");
 	}
 	public int getColor()
@@ -56,6 +61,7 @@ public class Player implements Runnable
 	}
 	public Player(BufferedReader in, OutputStreamWriter out, int x, int y)
 	{
+		this.connected=true;
 		this.out=out;
 		GAMEWIDTH=SnakeServer.GAMEWIDTH;
 		GAMEHEIGHT=SnakeServer.GAMEHEIGHT;
@@ -110,7 +116,7 @@ public class Player implements Runnable
 	public void run()
 	{
 		boolean WartePhase=true;
-		while (isAlive)
+		while (isAlive&&connected)
 		{
 			try
 			{
@@ -149,7 +155,10 @@ public class Player implements Runnable
 			}
 			catch (Exception e)
 			{
+				System.err.println("Exeption on Player: "+e);
+				System.err.println("Removing Player.");
 				isAlive=false;
+				connected=false;
 				SnakeServer.removePlayer(this);
 			}
 		}

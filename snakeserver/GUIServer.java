@@ -7,19 +7,25 @@ import java.net.Socket;
 public class GUIServer 
 {
 	private OutputStreamWriter out;
+	private boolean connected;
+	public boolean connected()
+	{
+		return connected;
+	}
 	public GUIServer(int Port)
 	{
 		try
 		{
 			ServerSocket ss = new ServerSocket(Port);
 			Socket guis = ss.accept();
+			connected=true;
 			out = new OutputStreamWriter(guis.getOutputStream());
 			sendString("SIZE "+SnakeServer.GAMEWIDTH+" "+SnakeServer.GAMEHEIGHT);
 		}
 		catch(Exception e)
 		{
-			System.err.println(e);
-			System.exit(1);
+			connected=false;
+			SnakeServer.sendError("Error in GUI-Server:"+e);
 		}
 		
 	}
@@ -32,9 +38,13 @@ public class GUIServer
 		}
 		catch (Exception e)
 		{
-			System.err.println("GUI disconnected");
-			System.exit(1);
+			connected=false;
+			SnakeServer.sendError("GUI disconnected");
 		}
+	}
+	public void MESSAGE(String s)
+	{
+		sendString("MESSAGE "+s);
 	}
 	public void FLUSH()
 	{
