@@ -123,6 +123,9 @@
 
 			login= false;
 			function receive_command(cmd) {
+				document.getElementById("reconnect_submit").blur();
+				document.getElementById("reconnect_submit").disabled= true;
+				document.getElementById("reconnect_submit").id= "";
 				if (cmd.substring(0, 9) == "ATTENTION") {
 					if (!login) {
 						login= true;
@@ -144,6 +147,9 @@
 
 			end= false;
 			function exit() {
+				document.getElementById("reconnect_submit").blur();
+				document.getElementById("reconnect_submit").disabled= true;
+				document.getElementById("reconnect_submit").id= "";
 				message("<form onsubmit=\"reconnect(); return false;\"><input id=\"reconnect_submit\" type=\"submit\" value=\"reconnect\" \/><\/form>");
 				end= true;
 			}

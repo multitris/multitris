@@ -21,7 +21,7 @@
 # along with multitris.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
-TIMEOUT= 1
+TIMEOUT= 2
 
 require 'multitrisclients'
 require 'httpserver'
