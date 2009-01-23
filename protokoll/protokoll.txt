@@ -20,18 +20,18 @@ PLONK
 (in Action-Phase) Das Tetris-Element des Clients ist am Boden angekommen und kann nicht mehr gesteuert werden. Wechsle in Warte-Phase
 
 NOTBAD
-(in Warte-Phase) Die User haben gewonnen (wie auch immer das funktionieren kann); Wechsle in LogIn-Phase
+(in Warte-Phase) Der User hat gewonnen; Wechsle in LogIn-Phase
 
 THATWASMISERABLE
-(in Warte-Phase) Die User haben verloren; Wechsle in LogIn-Phase
+(in Warte-Phase) Der User hat nicht gewonnen; Wechsle in LogIn-Phase
 
-Alle Server Befehle bis auf Chuck sind optional.
+Alle Server Befehle bis auf Chuck sind optional (d.h. sie dürfen vom Client ignoriert werden, siehe multitris-command-sequences.txt)
 
 ======= Client-Befehle =======
 
 Nach Verbindungsaufbau sendet der Client die Nachricht
 IWANTFUN x[ y]
-x ist die implementierte Protokollversion (hier 1.0), besteht nur aus
+x ist die implementierte Protokollversion (hier 0.1), besteht nur aus
 nicht-Leerzeichen; y ist benutzerdefinierter Name des Spielers (beliebige
 Zeichen inkl. Leerzeichen, Zeilenumbruch unzulässig). Um anonym zu spielen,
 lässt der Client y weg.
@@ -50,7 +50,7 @@ MOELLEMAN
 (in Action-Phase) Nach unten.
 
 MARIHUANA
-(in Action-Phase) Nach oben.
+(in Action-Phase) Nach oben. (Hat im normalen Multitris derzeit keine Auswirkung. Der Befehl wird zur Erweiterbarkeit des Spielkonzepts zur Verfügung gestellt.)
 
 TURN
 (in Action-Phase) Das Tetris-Element des Clients soll gegen den Uhrzeigersinn gedreht werden; ein Drehen im Uhrzeigersinn ist nicht moeglich
