@@ -42,7 +42,7 @@ public class GameLogic
 		this.height = DEFAULTHEIGHT;
 		
 		System.out.println("Connect your GUI to port "+GUIPORT+", please :)");
-		this.gui = new GUIServer(GUIPORT);
+		this.gui = new GUIServer(this, GUIPORT);
 		System.out.println("Thx. Game is started. Clients are welcome: Use port "+CLIENTSPORT+".");
 		this.playerManager = new PlayerManager(this, CLIENTSPORT);
 	}
@@ -92,6 +92,22 @@ public class GameLogic
 		this.playerManager.goodbyeMyFriends();
 		this.playerManager.shutDown();
 		this.gui.close();
+	}
+	
+	public String initStrForNewGui() // it's quick and dirty, I know
+	{
+		String str = "AUTH foobar\nSIZE " + this.width + " " + this.height + "\nFLUSH\n";
+		
+		for(int row=0;row<this.height;row++)
+		{
+			for(int col=0;col<this.width;col++)
+			{
+				if(this.fixedPixels[row][col] != 0)
+					str += "SET " + row + " " + col + " " + this.fixedPixels[row][col] + "\n";
+			}
+		}
+		
+		return str;
 	}
 	
 	public void takeOverControl()
