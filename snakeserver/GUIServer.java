@@ -42,6 +42,11 @@ public class GUIServer
 			SnakeServer.sendError("GUI disconnected");
 		}
 	}
+	public void POINTS(int index, int points)
+	{
+		sendString("POINTS "+index+" "+points);
+		System.out.println("Send: "+"POINTS "+index+" "+points);
+	}
 	public void MESSAGE(String s)
 	{
 		sendString("MESSAGE "+s);
