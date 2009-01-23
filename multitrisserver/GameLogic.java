@@ -30,6 +30,9 @@ public class GameLogic
 	private static final int INCREASESPEEDAFTER = 45; // gamespeed regulation time rate: every X seconds the gamespeed is increased
 	private static final int WINNINGSPEED = 200; // if gameOver is called, print winning message if the current gamespeed is at least as fast as this. may be zero to frustrate clients (no winning message will be printed).
 	private static final double NEWSTONEPROPABILITY = 0.4; // maximum propability of inserting a new stone into the game in one gamestep (depends on available space / available players)
+	private static final int POINTSPERPIXEL = 10; // player gets this number of points for each pixel of his color in a complete row
+	private static final int POINTSPERSTONE = 1; // all players get this number of points for each stone that is created
+	private static final boolean VERSUSMODE = true; // if set to false, all players play together (-> WINNINGSPEED). no points are given. if set to true, each player receives points for his pixels in completed rows. the one(s) with most points win(s).
 	/* END CONFIG *************/
 	
 	public GameLogic()
@@ -64,6 +67,7 @@ public class GameLogic
 		this.gui.RESET(true, true, true, true, true);
 		
 		this.playerManager.cleanUp();
+		this.playerManager.resetPlayerPoints();
 		this.playerManager.listGui(this.gui);
 		
 		this.gui.FLUSH();
@@ -335,7 +339,11 @@ public class GameLogic
 				if(this.validTransformation(tryThisStone, tryThisStone)) // call to see whether it fits
 				{
 					if(this.playerManager.activateNextPlayer(tryThisStone))
+					{
 						this.insertStone(tryThisStone);
+						if(VERSUSMODE)
+							this.playerManager.addAllPlayerPoints(POINTSPERSTONE);
+					}
 				}
 			}
 		}
@@ -410,6 +418,13 @@ public class GameLogic
 					afterRemoval = possibleNewField;
 					anyRowsRemoved = true;
 					rowExploded[row] = true;
+					
+					// add some points
+					if(VERSUSMODE)
+					{
+						for(int col=0;col<this.width;col++)
+							this.playerManager.addPlayerPoints(beforeRemoval[row][col], POINTSPERPIXEL);
+					}
 				}
 				else
 					break; // if this row cannot be removed, the next ones won't be safe to remove either
@@ -448,16 +463,25 @@ public class GameLogic
 	
 	private void gameOver()
 	{
-		if(this.currentSpeed <= WINNINGSPEED)
+		if(! VERSUSMODE)
 		{
-			this.gui.MESSAGE("Wow, that was fast. Well done!");
-			this.playerManager.allPlayersWon();
+			if(this.currentSpeed <= WINNINGSPEED)
+			{
+				this.gui.MESSAGE("Yeay! All players won. Congratulations!");
+				this.playerManager.allPlayersWon();
+			}
+			else
+			{
+				this.gui.MESSAGE("That sucked. All players lost. Go home and shame.");
+				this.playerManager.allPlayersLost();
+			}
 		}
 		else
 		{
-			this.gui.MESSAGE("Sorry, you lost :(");
-			this.playerManager.allPlayersLost();
+			this.gui.MESSAGE("Game over. Try to relax");
+			this.playerManager.bestPlayerWon();
 		}
+		
 		this.goOnPlaying = false; // stop the game
 	}
 	
