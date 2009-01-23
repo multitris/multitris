@@ -80,6 +80,34 @@ public class PlayerManager implements Runnable
 		}
 	}
 	
+	public void addPlayerPoints(int playerColor, int points)
+	{
+		for(int i=0;i<this.players.size();i++)
+		{
+			if(this.players.get(i).isAlive() && this.players.get(i).getColor() == playerColor)
+			{
+				this.players.get(i).setPoints(this.players.get(i).getPoints() + points);
+				this.parent.playersChanged();
+				break;
+			}
+		}
+	}
+	
+	public void addAllPlayerPoints(int points)
+	{
+		for(int i=0;i<this.players.size();i++)
+			this.addPlayerPoints(this.players.get(i).getColor(), points);
+	}
+	
+	public void resetPlayerPoints()
+	{
+		for(int i=0;i<this.players.size();i++)
+		{
+			if(this.players.get(i).isAlive())
+				this.players.get(i).setPoints(0);
+		}
+	}
+	
 	public void stoneHasPlonked(Stone s)
 	{
 		this.deactivatePlayer(s.getColor());
@@ -104,6 +132,26 @@ public class PlayerManager implements Runnable
 				this.players.get(i).deactivate();
 			
 			this.players.get(i).sendLose();
+		}
+	}
+	
+	public void bestPlayerWon()
+	{
+		int maxPoints = -1;
+		
+		for(int i=0;i<this.players.size();i++)
+			maxPoints = (this.players.get(i).getPoints() > maxPoints) ? this.players.get(i).getPoints() : maxPoints;
+		
+		// now sendLose / sendWin
+		for(int i=0;i<this.players.size();i++)
+		{
+			if(this.players.get(i).isPlaying())
+				this.players.get(i).deactivate();
+			
+			if(this.players.get(i).getPoints() == maxPoints)
+				this.players.get(i).sendWin();
+			else
+				this.players.get(i).sendLose();
 		}
 	}
 	
@@ -216,6 +264,7 @@ public class PlayerManager implements Runnable
 		player.sendToClient("ATTENTION " + this.colors[hisColor] + " " + hisColor);
 		this.nextActivatedPlayers.offer(player);
 		
+		this.cleanUpTo = (this.colors.length > this.cleanUpTo ? this.colors.length : this.cleanUpTo);
 		this.parent.playersChanged();
 	}
 	
