@@ -139,10 +139,11 @@ public class SnakeServer
 					else
 					{
 						GUI.SET(neu.x, neu.y, pl.getColor());
-						if (counter==10)
+						if (counter==50)
 						{
 							pl.getPoints().addFirst(pl.removedPoint());
-							
+							pl.setPunkte(pl.getPunkte()+1);
+							GUI.POINTS(pl.getColor(), pl.getPunkte());
 						}
 						else
 						{
@@ -150,7 +151,7 @@ public class SnakeServer
 						}
 					}
 				}
-				if (counter==100)
+				if (counter==50)
 					counter=0;
 			}
 			GUI.FLUSH();//so we can detect GUI disconnection even if no Player connected...

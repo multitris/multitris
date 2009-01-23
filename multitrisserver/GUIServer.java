@@ -18,6 +18,8 @@ public class GUIServer implements Runnable
 	private boolean someoneConnected;
 	private ServerSocket sSock;
 	private LinkedList<OutputStreamWriter> clients;
+	private GameLogic gameLogic;
+	
 	private void sendString(String s)
 	{
 		for (int i=0;i<clients.size();i++)
@@ -30,6 +32,16 @@ public class GUIServer implements Runnable
 			catch(Exception e)
 			{
 				System.err.println(e);
+				try
+				{
+					this.clients.get(i).close();
+				}
+				catch (Exception e2)
+				{
+					System.out.println(e2);
+				}
+				System.out.println("GUI disconnected.");
+				this.clients.remove(i--);
 			}
 		}
 	}
@@ -67,8 +79,9 @@ public class GUIServer implements Runnable
 	public void COLOR(int number, String color){sendString("COLOR "+number+" "+color);}
 	public void PLAYER(int number, String name){sendString("PLAYER "+number+" "+name);}
 	public void PLAYER(int number){sendString("PLAYER "+number);}
-	public GUIServer(int Port)
+	public GUIServer(GameLogic gameLogic, int Port)
 	{
+		this.gameLogic = gameLogic;
 		try
 		{
 			sSock = new ServerSocket(Port);
@@ -92,11 +105,27 @@ public class GUIServer implements Runnable
 			{
 				sSock.setSoTimeout(1000);
 				Socket clientSocket=sSock.accept();//wait for a client to connect
+				
+				if(this.someoneConnected) // not the first gui to connect
+				{
+					this.gameLogic.playersChanged(); // force resending players data
+				}
+				OutputStreamWriter out = new OutputStreamWriter(clientSocket.getOutputStream());
+				
+				if(this.someoneConnected) // not the first gui to connect
+				{
+					try
+					{
+						out.write(this.gameLogic.initStrForNewGui()); // init gui
+					}
+					catch (Exception e2)
+					{
+						System.out.println(e2);
+					}
+				}
+				
 				someoneConnected=true;
-	            OutputStreamWriter out
-	               = new OutputStreamWriter(
-	                    clientSocket.getOutputStream() );
-	            clients.add(out);
+				clients.add(out);
 			}
 			catch (SocketTimeoutException e)
 			{

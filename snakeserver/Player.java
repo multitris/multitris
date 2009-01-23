@@ -15,8 +15,17 @@ public class Player implements Runnable
 	private boolean isAlive;
 	private int direction;
 	private int color;
+	private int punkte;
 	private boolean connected;
 	private OutputStreamWriter out;
+	public int getPunkte()
+	{
+		return punkte;
+	}
+	public void setPunkte(int p)
+	{
+		punkte=p;
+	}
 	public boolean connected()
 	{
 		return connected;
@@ -129,7 +138,7 @@ public class Player implements Runnable
 					{
 						if (!split[1].equals("0.1"))
 						{
-							sendString("FUCKYOUT Wrong Protocol Version. Current Version is 0.1");
+							sendString("FUCKYOU Wrong Protocol Version. Current Version is 0.1");
 						}
 						else
 						{
