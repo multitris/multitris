@@ -58,6 +58,14 @@ module Multitris
 			@queue.shift
 		end
 
+		# Iterates over all clients
+		def each(&block)
+			@clients.each do |client|
+				next unless client
+				block.call(client)
+			end
+		end
+
 		def update(cmd)
 			case cmd
 			when :color

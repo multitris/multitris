@@ -28,6 +28,21 @@ require 'multitris/guiconcentrator'
 require 'multitris/guilog'
 
 require 'games/simple'
+require 'games/maze'
+
+games= Hash.new
+games["simple"]= Games::Simple
+games["maze"]= Games::Maze
+
+unless ARGV.size == 3
+	STDERR.puts "usage: ./gameserver guiport clientport game"
+	STDERR.puts
+	STDERR.puts "The following games are available:"
+	games.each_key do |game|
+		STDERR.puts "\t#{game}"
+	end
+	exit 1
+end
 
 gameboard= Multitris::GameBoard.new
 
@@ -37,7 +52,7 @@ gameboard.add_observer(logs)
 gui_concentrator= Multitris::GUIConcentrator.new(gameboard)
 
 Thread.new do
-	guis= TCPServer.new(12345)
+	guis= TCPServer.new(ARGV[0])
 	while gui= guis.accept
 		gui_concentrator.addGUI(gui)
 	end
@@ -46,13 +61,15 @@ end
 client_concentrator= Multitris::ClientConcentrator.new
 
 Thread.new do
-	clients= TCPServer.new(12346)
+	clients= TCPServer.new(ARGV[1])
 	while client= clients.accept
 		client_concentrator.addClient(client)
 	end
 end
 
-game= Games::Simple.new(gameboard, client_concentrator)
+game= games[ARGV[2]].new(gameboard, client_concentrator)
 
-sleep(600)
+loop do
+	sleep(1)
+end
 

@@ -42,6 +42,7 @@ module Multitris
 		def initialize
 			@colors= []
 			@players= []
+			@points= Hash.new(0)
 			@width= 0
 			@height= 0
 			@board= Hash.new
@@ -87,7 +88,7 @@ module Multitris
 		# Resets all pixel. This sets all pixels to nil.
 		def resetPixel
 			@board= Hash.new
-			notify_observers(:reset, :pixel)
+			notify_observers(:reset, "FIELD")
 		end
 
 		# Iterate over all pixel which are not nil. Block will
@@ -180,9 +181,56 @@ module Multitris
 			end
 		end
 
+		# Sets points for a player
+		def setPoints(n, points)
+			@points[n]= points
+			notify_observers(:points, n, points)
+		end
+
+		# Adds points for a player
+		def addPoints(n, points)
+			setPoints(n, @points[n] + points)
+		end
+
+		# Reads points for a player.
+		def getPoints(n)
+			@points[n]
+		end
+
+		alias :isPoints? :getPoints
+
+		# Resets all player points.
+		def resetPoints
+			@points= Hash.new(0)
+			notify_observers(:reset, :points)
+		end
+
+		# Iterates over all players points. Block will be given
+		# two arguments: n, points
+		def each_points(&block)
+			@points.each do |n, points|
+				block.call(i, points)
+			end
+		end
+
+		# Draws a horizontal line.
 		# Write a message to the GUI.
 		def message(text)
 			notify_observers(:message, text)
+		end
+
+		# Draws a horizontal line.
+		def drawHLine(x1, x2, y, value)
+			x1.upto(x2) do |x|
+				setPixel(x, y, value)
+			end
+		end
+
+		# Draws a vertical line.
+		def drawVLine(x, y1, y2, value)
+			y1.upto(y2) do |y|
+				setPixel(x, y, value)
+			end
 		end
 
 	end
