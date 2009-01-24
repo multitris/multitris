@@ -223,9 +223,30 @@ public class PlayerManager implements Runnable
 			case 4:	newCol = "ffff00"; break;
 			case 5:	newCol = "ff00ff"; break;
 			case 6:	newCol = "00ffff"; break;
-			default: newCol = Integer.toHexString(1048576 + (int)(Math.random() * 9437184.0)); break;
-		}
-		
+			default: // fancy color generating algorithm... :) i love it
+						int colId = newColor-6;
+				
+						for(int rgb=0;rgb<3;rgb++)
+						{
+							int componentValue = 0;
+					
+							int matcher = (int)(Math.pow(2, rgb)); // 1 / 2 / 4
+							for(int bitNr=7;bitNr>=0;bitNr--)
+							{
+								if((colId & matcher) != 0)
+									componentValue += Math.pow(2, bitNr);
+								matcher *= 8;
+							}
+					
+							String componentHex = Integer.toHexString(componentValue);
+							while(componentHex.length() < 2)
+								componentHex = "0" + componentHex;
+							
+							newCol += componentHex;
+						}
+						break;
+		}		
+
 		String[] newColors = new String[newColor+1];
 		for(int i=0;i<newColor;i++)
 			newColors[i] = this.colors[i];
