@@ -27,11 +27,11 @@ require 'multitris/clientconcentrator'
 require 'multitris/guiconcentrator'
 require 'multitris/guilog'
 
-require 'games/simple'
+require 'games/example'
 require 'games/maze'
 
 games= Hash.new
-games["simple"]= Games::Simple
+games["example"]= Games::Example
 games["maze"]= Games::Maze
 
 unless ARGV.size == 3

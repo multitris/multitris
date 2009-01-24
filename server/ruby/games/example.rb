@@ -24,7 +24,7 @@ require 'multitris/game'
 
 module Games
 
-	class Simple < Multitris::Game
+	class Example < Multitris::Game
 		
 		def initialize(board, clients)
 			super(board, clients)
