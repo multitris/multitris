@@ -25,13 +25,21 @@ require 'multitris/comand'
 
 module Multitris
 
+	# This Class handles multiple GUI connections and feeds them
+	# from a GameBoard. GUI's can be added after the game started
+	# as the GUIConcentrator repeats the missing Comands for the
+	# new GUI's
 	class GUIConcentrator
-		
+	
+		# board is the Board all GUI connections will be feed
+		# from.
 		def initialize(board)
 			@board= board
 			@guis= []
 		end
 
+		# Adds a GUI connection to the GameBoard. The new gui
+		# connection must be a child class of IO.
 		def addGUI(io)
 			gui= ComandSequence.new(io)
 			@board.add_observer(gui)

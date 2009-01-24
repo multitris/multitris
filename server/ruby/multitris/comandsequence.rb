@@ -22,8 +22,18 @@
 
 module Multitris
 
+	# A ComandSequence is some kind of io where Comands are
+	# transmitted. ComandSequence has a update method for the
+	# observer pattern. If update is called the argument of update
+	# will be transmitted.
 	class ComandSequence
 
+		# io is the IO object the Comands will be
+		# transmitted over. If a block is given, the block
+		# will be called for every Comand which is received
+		# over the ComandSequence. If the block returns false
+		# the Comand can be also recieved with the recieve
+		# method.
 		def initialize(io)
 			@io= io
 			@queue, input= IO.pipe
@@ -35,12 +45,13 @@ module Multitris
 						cmd.name= :norris
 						transmit(cmd)
 					else
-						input.puts str unless block_given? and yield(cmd)
+						input.puts cmd unless block_given? and yield(cmd)
 					end
 				end
 			end
 		end
 
+		# Transmit a Comand over the ComandSequence.
 		def transmit(cmd)
 			@io.puts cmd.to_s
 		end
@@ -48,6 +59,7 @@ module Multitris
 		# this is for the observer pattern
 		alias :update :transmit
 
+		# Receive a Comand from the ComandSequence.
 		def receive
 			Comand.from_string(@queue.readline.strip)
 		end

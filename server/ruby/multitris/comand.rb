@@ -36,9 +36,15 @@ end
 
 module Multitris
 
+	# This class represents a Multitris Comand. Multitris Comands
+	# are transmitted over ComandSequences. Every Comand
+	# has a name and optional arguments.
 	class Comand
 
+		# The name of the Comand
 		attr_accessor :name
+
+		# The optional arguments of the Comand
 		attr_accessor :args
 
 		def initialize(name, *args)
@@ -46,6 +52,9 @@ module Multitris
 			@args= args.flatten
 		end
 
+		# Create a Comand from a string. The string is in the
+		# format as transmitted over a ComandSequence. This
+		# is "NAME[ arg1[ arg2[...]]]".
 		def self.from_string(str)
 			result= Comand.new(nil)
 			result.args= str.split(" ")
@@ -53,19 +62,14 @@ module Multitris
 			result
 		end
 
-		def coerce(other)
-			puts "coerce"
-			case other
-			when Symbol
-				[other, self.name]
-			end
-		end
-
+		# Format a Comand as transmitted over a ComandSequence.
+		# This is "NAME[ arg1[ arg2[...]]]".
 		def to_s
 			result= ([self.name.to_s.upcase] + self.args).join(" ")
 			result
 		end
 
+		# This method is the same as comand.name == sym
 		def ===(sym)
 			self.name === sym
 		end

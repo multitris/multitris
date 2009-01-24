@@ -22,6 +22,8 @@
 
 module Multitris
 
+	# If this class is the observer for a GameBoard all gui
+	# Comands will be written to stdout.
 	class GUILog
 		
 		def update(cmd)

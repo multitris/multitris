@@ -24,11 +24,25 @@ require 'multitris/comand'
 
 module Multitris
 
+	# A ClientServer handles the connection to one Client.
 	class ClientServer < ComandSequence
 
+		# The players name.
 		attr_reader :name
+
+		# The number of the player.
 		attr_reader :number
 
+		# The argument must be a child class of IO. If given a
+		# block, the block will be yield for every Comand
+		# received. Comands names are translated into easier
+		# to understand names. The possible values are:
+		# - :new
+		# - :left
+		# - :right
+		# - :up
+		# - :down
+		# - :button
 		def initialize(io)
 			super(io) do |cmd|
 				case cmd
@@ -53,22 +67,27 @@ module Multitris
 			end
 		end
 
+		# Sets the player number.
 		def enumerate(n)
 			@number= n
 		end
 
+		# Transmits a start Comand.
 		def start
 			transmit(Comand.new(:goforrest))
 		end
 
+		# Transmits a  stop Comand.
 		def stop
 			transmit(Comand.new(:plonk))
 		end
 
+		# Transmits a 'you win' Comand.
 		def win
 			transmit(Comand.new(:notbad))
 		end
 
+		# Transmits a 'you lose' Comand.
 		def lose
 			transmit(Comand.new(:thatwasmiserable))
 		end

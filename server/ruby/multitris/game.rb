@@ -22,6 +22,10 @@
 
 module Multitris
 
+	# The parent class of all Games. The game is given a GameBoard
+	# and a ClientConcentrator. The GameBoard's purpose is to
+	# output to the GUI's. The purpose of the ClientConcentrator
+	# is to get the Comands from all Clients.
 	class Game
 
 		def initialize(board, clients)
