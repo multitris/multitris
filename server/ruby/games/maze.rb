@@ -51,6 +51,7 @@ module Games
 			end
 			Thread.new do
 				@board.setSize(Width, Height)
+				@board.message("be the first to leave the MAZE")
 				newGame
 				loop do
 					while a= clients.receive

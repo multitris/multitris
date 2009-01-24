@@ -209,7 +209,7 @@ module Multitris
 		# two arguments: n, points
 		def each_points(&block)
 			@points.each do |n, points|
-				block.call(i, points)
+				block.call(n, points)
 			end
 		end
 
