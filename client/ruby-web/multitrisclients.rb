@@ -1,3 +1,25 @@
+#
+# Author:: Johannes Krude
+# Copyright:: (c) Johannes Krude 2008
+# License:: AGPL3
+#
+#--
+# This file is part of multitris.
+#
+# multitris is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multitris is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with multitris.  If not, see <http://www.gnu.org/licenses/>.
+#++
+
 require 'socket'
 
 class MultitrisClients
@@ -48,7 +70,7 @@ class MultitrisClients
 
 	def userReceive(cookie)
 		result= @queues[cookie].shift || ""
-		if @connections[cookie] and @connections[cookie].closed? and @queues[cookie].size == 0
+		if @connections[cookie] and @connections[cookie].closed? and @queues[cookie] and @queues[cookie].size == 0
 			@connections.delete(cookie)
 			@queues.delete(cookie)
 		end
@@ -56,7 +78,8 @@ class MultitrisClients
 	end
 
 	def userClose(cookie, reason= "")
-		@queues[cookie]= ["FUCKYOU " + reason]
+		queue= @queues[cookie]
+		queue<< "FUCKYOU " + reason
 		begin # FUCKYOU before close, so other threads won't delete this user to early
 			@connections[cookie].close if @connections[cookie]
 		rescue IOError

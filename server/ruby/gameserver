@@ -1,0 +1,58 @@
+#!/usr/bin/ruby
+#
+# Author:: Johannes Krude
+# Copyright:: (c) Johannes Krude 2008
+# License:: AGPL3
+#
+#--
+# This file is part of multitris.
+#
+# multitris is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multitris is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with multitris.  If not, see <http://www.gnu.org/licenses/>.
+#++
+
+require 'socket'
+require 'multitris/gameboard'
+require 'multitris/clientconcentrator'
+require 'multitris/guiconcentrator'
+require 'multitris/guilog'
+
+require 'games/simple'
+
+gameboard= Multitris::GameBoard.new
+
+logs= Multitris::GUILog.new
+gameboard.add_observer(logs)
+
+gui_concentrator= Multitris::GUIConcentrator.new(gameboard)
+
+Thread.new do
+	guis= TCPServer.new(12345)
+	while gui= guis.accept
+		gui_concentrator.addGUI(gui)
+	end
+end
+
+client_concentrator= Multitris::ClientConcentrator.new
+
+Thread.new do
+	clients= TCPServer.new(12346)
+	while client= clients.accept
+		client_concentrator.addClient(client)
+	end
+end
+
+game= Games::Simple.new(gameboard, client_concentrator)
+
+sleep(600)
+
