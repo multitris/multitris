@@ -98,8 +98,7 @@ public class Client
              System.err.println(e);
         }
     }
-    public void loop(){
-        gp.MESSAGE("Trying to connect...");
+    public void loop(Thread thDemo){
     	try
         {
         	Socket cs = new Socket(url, port);
@@ -107,14 +106,15 @@ public class Client
                    = new BufferedReader(
                        new InputStreamReader(
                           cs.getInputStream() ) );
-            	gp.RESET(false, false, false, false, true);
-                processRequest(in);
-                cs.close();
-                gp.MESSAGE("Server closed connection.");
+        	thDemo.stop();
+            gp.RESET(true, true, true, true, true);
+            processRequest(in);
+            cs.close();
+            gp.MESSAGE("Server closed connection.");
         }
     	catch(ConnectException e)
     	{
-    		gp.MESSAGE("Server not found... startig Demo");
+    		gp.MESSAGE("...please start any Server....");
     	}
         catch( Exception e ){
              gp.MESSAGE( e.toString() );

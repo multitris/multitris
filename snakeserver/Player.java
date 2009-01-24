@@ -76,8 +76,6 @@ public class Player implements Runnable
 		GAMEHEIGHT=SnakeServer.GAMEHEIGHT;
 		sockIn = in;
 		Points = new LinkedList<Point>();
-		for (int k=0;k<=6;k++)
-			Points.add(new Point(x+k, y+color));
 		isAlive=true;
 		new Thread(this).start();
 		direction=0;

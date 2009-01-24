@@ -49,9 +49,31 @@ public class SnakeServer
 		GUI.PLAYER(index, color, name);
 		p.setColor(index);
 		Players.add(p);
-		for (int i=0;i<p.getPoints().size();i++)
+		//Find some nice place for the new Snake
+		int x=0;
+		int y=0;
+		nothingFound:
+		{//This block repeats checking the whole game for 6 horizontal free blocks
+			//to place the snake in.. if nothing found, it waits 2 seconds and retries.
+			while (true)
+			{
+				for (x=0;x<GAMEWIDTH-6;x++)
+					for (y=0;y<GAMEHEIGHT;y++)
+						if (checkCollision(new Point(x,y))==false
+						&& checkCollision(new Point(x+1, y))==false
+						&& checkCollision(new Point(x+2, y))==false
+						&& checkCollision(new Point(x+3, y))==false
+						&& checkCollision(new Point(x+4, y))==false
+						&& checkCollision(new Point(x+5, y))==false
+						&& checkCollision(new Point(x+6, y))==false
+						) break nothingFound;
+				Misc.delay(2000);
+			}
+		}
+		for (int k=0;k<=6;k++)
 		{
-			GUI.SET(p.getPoints().get(i).x, p.getPoints().get(i).y,p.getColor());
+			p.getPoints().add(new Point(x+k, y));
+			GUI.SET(x+k, y, p.getColor());
 		}
 		p.sendString("ATTENTION "+color+" "+index);
 		p.sendString("GOFORREST");
