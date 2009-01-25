@@ -41,6 +41,7 @@ module Multitris
 		
 		def initialize
 			@colors= []
+			@next_color= 2
 			@players= []
 			@points= Hash.new(0)
 			@width= 0
@@ -106,7 +107,8 @@ module Multitris
 		end
 
 		# Sets a color in the color map. Colors can be set to
-		# nil.
+		# nil. If no value is given, a random color will be
+		# picked.
 		def setColor(n, value= :rand)
 			if value == :rand
 				value= (rand*16777216).floor
@@ -135,6 +137,19 @@ module Multitris
 		def resetColor
 			@colors= []
 			notify_observers(:reset, :color)
+		end
+
+		# Allocates a number for a color. All numbers for non
+		# player colors should be allocated here. Only even
+		# numbers get allocated, so the ClientConcentrator can
+		# use odd numbers for new players. If no value is
+		# given, a random color will be picked. Returns the
+		# new number.
+		def newColor(value= :rand)
+			n= @next_color
+			@next_color+= 2
+			setColor(n, value)
+			n
 		end
 
 		# Iterates over all colors in the color map. Block

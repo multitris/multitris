@@ -29,13 +29,16 @@ module Multitris
 	# A ClientConcentrator handles connections from multiple
 	# Clients. The Game needs only to poll the ClientConcentrator
 	# to get the Comands from all Clients. The ClientConcentrator
-	# also handles the enumeration of players. If the
-	# ClientConcentrator is an observer of a GameBoard, it will
-	# tell the client's there color after every change.
+	# also handles the enumeration of players. Players only get
+	# odd numbers, so the GameBoard can use even numbers for non
+	# player colors. If the ClientConcentrator is an observer of a
+	# GameBoard, it will tell the client's there color after every
+	# change.
 	class ClientConcentrator
 		
 		def initialize
 			@clients= [nil]
+			@clients_next= 1
 			@queue= []
 		end
 
@@ -47,7 +50,8 @@ module Multitris
 				@queue<< [client, cmd]
 				true
 			end
-			client.enumerate @clients.size
+			client.enumerate @clients_next
+			@clients_next+= 2
 			@clients[client.number]= client
 		end
 

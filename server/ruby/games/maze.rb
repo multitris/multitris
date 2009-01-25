@@ -34,6 +34,7 @@ module Games
 			@board= board
 			@clientes= clients
 			@positions= Hash.new
+			@color_wall= @board.newColor(nil)
 			Thread.new do
 				i= 0
 				loop do
@@ -91,10 +92,10 @@ module Games
 		end
 
 		def generateMaze
-			@board.drawHLine(2, Width-1, 0, 255)
-			@board.drawHLine(0, Width-1, Height-1, 255)
-			@board.drawVLine(0, 2, Height-1, 255)
-			@board.drawVLine(Width-1, 0, Height, 255)
+			@board.drawHLine(2, Width-1, 0, @color_wall)
+			@board.drawHLine(0, Width-1, Height-1, @color_wall)
+			@board.drawVLine(0, 2, Height-1, @color_wall)
+			@board.drawVLine(Width-1, 0, Height, @color_wall)
 			taken= Hash.new
 			Height.times { |i| taken[[0, i]]= true }
 			Height.times { |i| taken[[Width-1, i]]= true }
@@ -104,7 +105,7 @@ module Games
 			Width.times do |x|
 				Height.times do |y|
 					next if taken[[x, y]]
-					@board.setPixel(x, y, 255)
+					@board.setPixel(x, y, @color_wall)
 				end
 			end
 		end
@@ -139,7 +140,7 @@ module Games
 			i+= 1 if taken[[x+1, y]]==:way
 			if i > 0
 				taken[[x, y]]= true
-				@board.setPixel(x, y, 255)
+				@board.setPixel(x, y, @color_wall)
 			end
 		end
 
@@ -152,7 +153,7 @@ module Games
 		def move(client, &block)
 			xy= @xy[client.number]
 			new= block.call(xy)
-			return if @board.getPixel(*new)==255
+			return if @board.getPixel(*new)==@color_wall
 			removePlayer(client)
 			setPlayer(new[0], new[1], client)
 			@board.flush
@@ -184,7 +185,7 @@ module Games
 		end
 
 		def newGame
-			@board.setColor(255)
+			@board.setColor(@color_wall)
 			@board.resetPixel
 			generateMaze
 			@start= [((Width-2)*rand).floor+1, ((Height-2)*rand).floor+1]
