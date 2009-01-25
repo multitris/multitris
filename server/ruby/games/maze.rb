@@ -79,6 +79,8 @@ module Games
 							move(client) do |xy|
 								[xy[0], xy[1]+1]
 							end
+						when :button
+							setStart(client)
 						end
 						xy= @xy[client.number]
 						if xy[0] == 0 or xy[1] == 0
