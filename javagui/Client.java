@@ -22,7 +22,15 @@ public class Client
            while((first=in.readLine())!=null)
            {
         	   String command = first.split(" ", 3)[0];
-	           if(command.equals("POINTS"))
+	           if(command.equals("WINNERS"))
+	           {
+	        	   String[] tmp = first.split(" ", 60);
+	        	   int[] winners = new int[tmp.length-1];
+	        	   for (int i=1;i<tmp.length;i++)
+	        		   winners[i-1]=Integer.parseInt(tmp[i]);
+	        	   gp.WINNERS(winners);
+	           }
+        	   if(command.equals("POINTS"))
 	           {
 	        	   int n=Integer.parseInt(first.split(" ", 3)[1]);
 	        	   int p=Integer.parseInt(first.split(" ", 3)[2]);

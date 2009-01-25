@@ -116,6 +116,19 @@ public class GamePanel extends JPanel
 		}
 		players.add(new Player(n, name));
 	}
+	public void WINNERS(int[] n)
+	{
+		String msg="Gewinner: ";
+		for (int i=0;i<n.length;i++)
+		{
+			for (int j=0;j<players.size();j++)
+				if (players.get(j).ID==n[i])
+				{
+					msg+=players.get(j).name+"; ";
+				}
+		}
+		MESSAGE(msg.substring(0, msg.length()-2));
+	}
 	public void SET(int column, int row, int color, String effect)
 	{
 		if (row >= vheight||column>=vwidth ||row<0||column<0)
