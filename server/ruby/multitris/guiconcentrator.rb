@@ -42,7 +42,6 @@ module Multitris
 		# connection must be a child class of IO.
 		def addGUI(io)
 			gui= ComandSequence.new(io)
-			@board.add_observer(gui)
 			width, height= @board.getSize
 			gui.transmit(Comand.new(:size, height, width))
 			@board.each_color do |n, color|
@@ -58,6 +57,7 @@ module Multitris
 				gui.transmit(Comand.new(:set, y, x, value))
 			end
 			gui.transmit(Comand.new(:flush))
+			@board.add_observer(gui)
 			@guis << gui
 		end
 
