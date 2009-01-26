@@ -488,7 +488,7 @@ public class GameLogic
 			}
 			else
 			{
-				this.gui.MESSAGE("That sucked. All players lost. Go home and shame.");
+				this.gui.MESSAGE("That sucked. All players lost. Go home and be ashamed of yourself.");
 				this.playerManager.allPlayersLost();
 			}
 		}
