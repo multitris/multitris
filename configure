@@ -1,0 +1,5 @@
+#!/bin/sh
+cd client/ruby-web/io2io
+./configure
+cd ../magicmime
+./configure
