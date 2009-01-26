@@ -94,6 +94,7 @@ module Games
 		end
 
 		def generateMaze
+			@board.reset
 			@board.drawHLine(2, Width-1, 0, @color_wall)
 			@board.drawHLine(0, Width-1, Height-1, @color_wall)
 			@board.drawVLine(0, 2, Height-1, @color_wall)
@@ -146,10 +147,10 @@ module Games
 			end
 		end
 
-		def setStart(client)
+		def setStart(client, flush= true)
 			removePlayer(client)
 			setPlayer(@start[0],@start[1], client)
-			@board.flush
+			@board.flush if flush
 		end
 
 		def move(client, &block)
@@ -188,7 +189,6 @@ module Games
 
 		def newGame
 			@board.setColor(@color_wall)
-			@board.resetPixel
 			generateMaze
 			@start= [((Width-2)*rand).floor+1, ((Height-2)*rand).floor+1]
 			while @board.getPixel(@start[0], @start[1])
@@ -197,8 +197,9 @@ module Games
 			@xy= []
 			@positions= Hash.new
 			@clients.each do |player|
-				setStart(player)
+				setStart(player, false)
 			end
+			@board.flush
 		end
 
 	end
