@@ -37,6 +37,8 @@ module Multitris
 		def initialize(io)
 			@io= io
 			@queue, input= IO.pipe
+			@mutex_transmit= Mutex.new
+			@mutex_receive= Mutex.new
 			Thread.new do
 				loop do
 					str= @io.readline.strip
@@ -51,17 +53,25 @@ module Multitris
 			end
 		end
 
-		# Transmit a Comand over the ComandSequence.
+		# Transmit a Comand over the ComandSequence. Transmit
+		# is thread save. No two Comand's will be mixed
+		# together while transmitting.
 		def transmit(cmd)
-			@io.puts cmd.to_s
+			@mutex_transmit.synchronize do
+				@io.puts cmd.to_s
+			end
 		end
 
 		# this is for the observer pattern
 		alias :update :transmit
 
-		# Receive a Comand from the ComandSequence.
+		# Receive a Comand from the ComandSequence. Receive is
+		# thread. If one thread is still reading, the others
+		# will wait.
 		def receive
-			Comand.from_string(@queue.readline.strip)
+			@mutex_receive.synchronize do
+				Comand.from_string(@queue.readline.strip)
+			end
 		end
 	
 	end
