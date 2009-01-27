@@ -94,7 +94,7 @@ module Games
 		end
 
 		def generateMaze
-			@board.reset
+			@board.resetPixel
 			@board.drawHLine(2, Width-1, 0, @color_wall)
 			@board.drawHLine(0, Width-1, Height-1, @color_wall)
 			@board.drawVLine(0, 2, Height-1, @color_wall)
