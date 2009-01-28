@@ -70,6 +70,9 @@ class MultitrisClients
 		begin
 			@mutex_transmit[cookie].synchronize do
 				@connections[cookie].puts(string)
+				if string=~ /^FUCKYOU( (.*?))?$/
+					@connections[cookie].close
+				end
 			end
 		rescue Errno::EPIPE
 			userCLose(cookie, "connection unexpected lost");
