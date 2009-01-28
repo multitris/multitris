@@ -1,4 +1,4 @@
-all: xjavaclient xjavagui xsnakeserver xmultitrisserver ruby-web
+all: xjavaclient xjavagui xsnakeserver xmultitrisserver ruby-web ruby-lib-doc
 
 xjavagui:
 	javac javagui/MainWindow.java
@@ -14,6 +14,9 @@ xmultitrisserver:
 
 ruby-web:
 	make -C client/ruby-web
+
+ruby-lib-doc:
+	rdoc -o ruby-lib/doc -S -N -d ruby-lib
 
 clean:
 	rm -f javagui/*.class

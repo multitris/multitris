@@ -136,7 +136,7 @@ module Multitris
 		# Resets all colors in the color map.
 		def resetColor
 			@colors= []
-			notify_observers(:reset, :color)
+			notify_observers(:reset, "COLOR")
 		end
 
 		# Allocates a number for a color. All numbers for non
@@ -183,7 +183,7 @@ module Multitris
 		# Resets all player names.
 		def resetPlayer
 			@players= []
-			notify_observers(:reset, :player)
+			notify_observers(:reset, "PLAYER")
 		end
 
 		# Iterates over all player names. Block will be given
@@ -217,7 +217,7 @@ module Multitris
 		# Resets all player points.
 		def resetPoints
 			@points= Hash.new(0)
-			notify_observers(:reset, :points)
+			notify_observers(:reset, "POINTS")
 		end
 
 		# Iterates over all players points. Block will be given
@@ -232,6 +232,42 @@ module Multitris
 		# Write a message to the GUI.
 		def message(text)
 			notify_observers(:message, text)
+		end
+
+
+		# Executes a Comand on this gameboard every valid
+		# Comand execution should result in the same Comand
+		# to be notified to all observers.
+		def execute(cmd)
+			case cmd.name
+			when :size
+				self.setSize(cmd.args[1], cmd.args[0])
+			when :color
+				self.setColor(cmd.args[0], cmd.args[1])
+			when :set
+				color= cmd.args[2]
+				color= nil if color == 0
+				self.setPixel(cmd.args[1], cmd.args[0], color)
+			when :flush
+				self.flush
+			when :player
+				self.setPlayer(cmd.args[0], cmd.args[1])
+			when :points
+				self.setPoints(cmd.args[0], cmd.args[1])
+			when :reset
+				case cmd.args[0]
+				when :color
+					self.resetColor
+				when :field
+					self.resetPixel
+				when :player
+					self.resetPlayer
+				when :points
+					self.resetPoints
+				end
+			when :message
+				self.message(cmd.args[0])
+			end
 		end
 
 		# Draws a horizontal line.

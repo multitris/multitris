@@ -20,6 +20,8 @@
 # along with multitris.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'multitris/comand'
+
 module Multitris
 
 	# A ComandSequence is some kind of io where Comands are
@@ -40,14 +42,25 @@ module Multitris
 			@mutex_transmit= Mutex.new
 			@mutex_receive= Mutex.new
 			Thread.new do
-				loop do
-					str= @io.readline.strip
-					cmd= Comand.from_string(str)
-					if cmd === :chuck
-						cmd.name= :norris
-						transmit(cmd)
-					else
-						input.puts cmd unless block_given? and yield(cmd)
+				begin
+					@io.each do |str|
+						str.strip!
+						cmd= Comand.from_string(str)
+						if cmd === :chuck
+							cmd.name= :norris
+							transmit(cmd)
+						else
+							input.puts cmd unless block_given? and yield(cmd)
+						end
+					end
+					begin
+						@io.close
+					rescue IOError
+					end
+				rescue Errno::ECONNRESET
+					begin
+						@io.close
+					rescue IOError
 					end
 				end
 			end
@@ -58,7 +71,14 @@ module Multitris
 		# together while transmitting.
 		def transmit(cmd)
 			@mutex_transmit.synchronize do
-				@io.puts cmd.to_s
+				begin
+					@io.puts cmd.to_s
+				rescue IOError
+					begin
+						@io.close
+					rescue IOError
+					end
+				end
 			end
 		end
 
@@ -73,7 +93,12 @@ module Multitris
 				Comand.from_string(@queue.readline.strip)
 			end
 		end
-	
+
+		# Wether the io is closed
+		def closed?
+			@io.closed?
+		end
+
 	end
 
 end

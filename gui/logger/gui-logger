@@ -1,0 +1,56 @@
+#!/usr/bin/ruby
+#
+# Author:: Johannes Krude
+# Copyright:: (c) Johannes Krude 2008
+# License:: AGPL3
+#
+#--
+# This file is part of multitris.
+#
+# multitris is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# multitris is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with multitris.  If not, see <http://www.gnu.org/licenses/>.
+#++
+
+require 'socket'
+require 'multitris/comandsequence'
+
+unless (2..3) === ARGV.size
+	STDERR.puts "usage: ./gui-logger server port [outfile]"
+	exit 1
+end
+
+out= case ARGV[2]
+when "-"
+	STDOUT
+when nil
+	STDOUT
+else
+	File.open(ARGV[2], "w")
+end
+
+start= nil
+
+begin
+input= Multitris::ComandSequence.new(TCPSocket.new(ARGV[0], ARGV[1])) do |cmd|
+	start= Time.now unless start
+	out.puts "#{Time.now-start} #{cmd}"
+end
+rescue Errno::ECONNREFUSED
+	STDERR.puts "Connection refused"
+	exit 2
+end
+
+until input.closed?
+	sleep 0.1
+end
+
