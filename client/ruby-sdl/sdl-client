@@ -112,7 +112,6 @@ Thread.new do
 				client.close
 				exit
 			end
-			next unless control
 			block= case event
 			when SDL::Event::KeyUp
 				key_repeat_stop
@@ -122,6 +121,7 @@ Thread.new do
 				nil
 			when SDL::Event::KeyDown
 				key_repeat_stop
+				next unless control
 				case event.sym
 				when KEY_LEFT
 					lambda { client.left }
@@ -136,6 +136,7 @@ Thread.new do
 				end
 			when SDL::Event::JoyButtonDown
 				key_repeat_stop
+				next unless control
 				case event.button
 				when JOY_LEFT
 					lambda { client.left }
@@ -162,6 +163,7 @@ Thread.new do
 				key_repeat_start(&block)
 			end
 		end
+		sleep 0.01
 	end
 end
 
@@ -172,7 +174,6 @@ begin
 			control= true
 		when "PLONK"
 			control= false
-			key_repeat_stop
 		when /^ATTENTION (\w\w\w\w\w\w) (\d+)$/
 			puts "You are player number #{$2}"
 			puts "Your color is ##{$1}"
