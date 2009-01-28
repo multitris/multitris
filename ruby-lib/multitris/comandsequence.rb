@@ -20,6 +20,7 @@
 # along with multitris.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'observer'
 require 'multitris/comand'
 
 module Multitris
@@ -27,8 +28,11 @@ module Multitris
 	# A ComandSequence is some kind of io where Comands are
 	# transmitted. ComandSequence has a update method for the
 	# observer pattern. If update is called the argument of update
-	# will be transmitted.
+	# will be transmitted. ComandSequence implements the observer
+	# pattern. When the ComandSequence is closed all obsevres are
+	# notified with notify_observers(self, :close).
 	class ComandSequence
+		include Observable
 
 		# io is the IO object the Comands will be
 		# transmitted over. If a block is given, the block
@@ -53,15 +57,9 @@ module Multitris
 							input.puts cmd unless block_given? and yield(cmd)
 						end
 					end
-					begin
-						@io.close
-					rescue IOError
-					end
 				rescue Errno::ECONNRESET
-					begin
-						@io.close
-					rescue IOError
-					end
+				ensure
+					close
 				end
 			end
 		end
@@ -74,10 +72,7 @@ module Multitris
 				begin
 					@io.puts cmd.to_s
 				rescue IOError
-					begin
-						@io.close
-					rescue IOError
-					end
+					close
 				end
 			end
 		end
@@ -94,9 +89,20 @@ module Multitris
 			end
 		end
 
-		# Wether the io is closed
+		# Returns wether the io is closed.
 		def closed?
 			@io.closed?
+		end
+
+		# Close the io and notify all observers.
+		def close
+			return if @io.closed?
+			begin
+				@io.close
+			rescue IOError
+			end
+			changed
+			notify_observers(self, :close)
 		end
 
 	end

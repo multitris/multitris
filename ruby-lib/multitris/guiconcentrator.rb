@@ -42,6 +42,7 @@ module Multitris
 		# connection must be a child class of IO.
 		def addGUI(io)
 			gui= ComandSequence.new(io)
+			gui.add_observer(self)
 			width, height= @board.getSize
 			gui.transmit(Comand.new(:size, height, width))
 			@board.each_color do |n, color|
@@ -59,6 +60,22 @@ module Multitris
 			gui.transmit(Comand.new(:flush))
 			@board.add_observer(gui)
 			@guis << gui
+		end
+
+		# Remove a ComandSequence from the GUIConcentrator.
+		def rmGUI(gui)
+			return unless @guis.include?(gui)
+			@board.delete_observer(gui)
+			@guis.delete(gui)
+		end
+
+		# When this method is called with a ComandSequence and
+		# msg==:close, the ComandSequence will be removed from
+		# the GUIConecentrator.
+		def update(gui, msg)
+			if ComandSequence === gui and msg == :close
+				rmGUI(gui)
+			end
 		end
 
 	end
