@@ -146,14 +146,18 @@ Thread.new do
 					lambda { client.up }
 				when JOY_DOWN
 					lambda { client.down }
-				when JOY_TURN
+				else
 					lambda { client.turn }
 				end
 			when SDL::Event::JoyAxis
 				case event.axis
 				when 0
 					$joy_left= 1.0 * event.value / 32768
+				when 2
+					$joy_left= 1.0 * event.value / 32768
 				when 1
+					$joy_up= 1.0 * event.value / 32768
+				when 3
 					$joy_up= 1.0 * event.value / 32768
 				end
 				nil
