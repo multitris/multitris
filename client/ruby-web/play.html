@@ -124,12 +124,7 @@
 			login= false;
 			connection= false;
 			function receive_command(cmd) {
-				if (document.getElementById("reconnect_submit")) {
-					document.getElementById("reconnect_submit").blur();
-					document.getElementById("reconnect_submit").disabled= true;
-					document.getElementById("reconnect_submit").id= "";
-				}
-				if ((!connection) && (cmd.substring(0,7) != "FUCKYOU")) {
+				if ((!connection) && (!end) && (cmd.substring(0,7) != "FUCKYOU")) {
 					setTimeout("keepalive()", 500);
 					login1();
 					connection= true;
@@ -155,14 +150,24 @@
 
 			end= false;
 			function exit() {
+				connection= false;
 				if (document.getElementById("reconnect_submit")) {
 					document.getElementById("reconnect_submit").blur();
 					document.getElementById("reconnect_submit").disabled= true;
 					document.getElementById("reconnect_submit").id= "";
 				}
+				if (document.getElementById("player_name")) {
+					document.getElementById("player_name").blur();
+					document.getElementById("player_name").disabled= true;
+					document.getElementById("player_name").id= "";
+				}
+				if (document.getElementById("login_submit")) {
+					document.getElementById("login_submit").blur();
+					document.getElementById("login_submit").disabled= true;
+					document.getElementById("login_submit").id= "";
+				}
 				message("<form onsubmit=\"reconnect(); return false;\"><input id=\"reconnect_submit\" type=\"submit\" value=\"reconnect\" \/><\/form>");
 				end= true;
-				connection= false;
 			}
 
 			window.onload= function () {
@@ -219,6 +224,7 @@
 			function disconnect() {
 				document.getElementById("disconnect_submit").blur();
 				document.getElementById("disconnect_submit").disabled= true;
+				command("FUCKYOU leaving the game");
 				message("disconnected");
 				exit();
 			}
