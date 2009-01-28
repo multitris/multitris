@@ -29,10 +29,14 @@ class MultitrisClients
 		@port= port
 		@connections= Hash.new
 		@queues= Hash.new
+		@mutex_transmit= Hash.new
+		@mutex_recieve= Hash.new
 	end
 
 	def userAdd(cookie)
 		@queues[cookie]= []
+		@mutex_transmit[cookie]= Mutex.new
+		@mutex_recieve[cookie]= Mutex.new
 		begin
 			@connections[cookie]= TCPSocket.new(@server, @port)
 		rescue Errno::ECONNREFUSED
@@ -46,8 +50,10 @@ class MultitrisClients
 					if line=~ /^FUCKYOU( (.*?))?$/
 						userClose(cookie, $2 || "");
 					else
-						queue= @queues[cookie]
-						queue<< line
+						@mutex_recieve[cookie].synchronize do
+							queue= @queues[cookie]
+							queue<< line if queue
+						end
 					end
 				end
 			rescue
@@ -62,27 +68,35 @@ class MultitrisClients
 
 	def userTransmit(cookie, string)
 		begin
-			@connections[cookie].puts(string)
+			@mutex_transmit[cookie].synchronize do
+				@connections[cookie].puts(string)
+			end
 		rescue Errno::EPIPE
 			userCLose(cookie, "connection unexpected lost");
 		end
 	end
 
 	def userReceive(cookie)
-		result= @queues[cookie].shift || ""
-		if @connections[cookie] and @connections[cookie].closed? and @queues[cookie] and @queues[cookie].size == 0
-			@connections.delete(cookie)
-			@queues.delete(cookie)
+		result= nil
+		@mutex_recieve[cookie].synchronize do
+			result= @queues[cookie].shift || ""
+			if @connections[cookie] and @connections[cookie].closed? and @queues[cookie] and @queues[cookie].size == 0
+				@connections.delete(cookie)
+				@queues.delete(cookie)
+				@mutex.delete(cookie)
+			end
 		end
 		result
 	end
 
 	def userClose(cookie, reason= "")
-		queue= @queues[cookie]
-		queue<< "FUCKYOU " + reason
-		begin # FUCKYOU before close, so other threads won't delete this user to early
-			@connections[cookie].close if @connections[cookie]
-		rescue IOError
+		@mutex_recieve[cookie].synchronize do
+			queue= @queues[cookie]
+			queue<< "FUCKYOU " + reason if queue
+			begin # FUCKYOU before close, so other threads won't delete this user to early
+				@connections[cookie].close if @connections[cookie]
+			rescue IOError
+			end
 		end
 	end
 

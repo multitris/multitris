@@ -51,7 +51,6 @@ webserver.listen(ARGV[2]) do |filename, vars|
 				next "FUCKYOU invalid cookie" unless $1 == cookie
 				clients.userAdd(cookie);
 				timeouts.register(cookie) do
-					timeouts.clear(cookie)
 					clients.userClose(cookie, "timeout")
 				end
 				clients.userReceive(cookie)

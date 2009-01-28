@@ -29,6 +29,7 @@ class Timeouts
 		@blocks= Hash.new
 		@sleeps= []
 		@times= Hash.new
+		@mutex= Hash.new
 		Thread.new do
 			while true
 				if @sleeps[0]
@@ -38,11 +39,15 @@ class Timeouts
 					if wait > 0
 						sleep wait # wait for the timeout
 					else
-						if @times[name] and (@times[name] < Time.now)
-							block= @blocks[name] # ensure no other thread deleted it before calling
-							block.call if block
+						@mutex[name].synchronize do
+							if @times[name] and (@times[name] < Time.now)
+								block= @blocks[name] # ensure no other thread deleted it before calling
+								block.call if block
+								@times.delete(name)
+								@blocks.delete(name)
+							end
+							@sleeps.shift
 						end
-						@sleeps.shift
 					end
 				else
 					sleep @time/10
@@ -56,6 +61,7 @@ class Timeouts
 	# Thread. Also be careful the execution of the block, blocks
 	# the execution of other timeouts.
 	def register(name, &block)
+		@mutex[name]= Mutex.new
 		@blocks[name]= block
 		reset(name)
 	end
@@ -64,14 +70,18 @@ class Timeouts
 	# or the timeout will arrive.
 	def reset(name)
 		time= Time.now + @time
-		@times[name]= time
-		@sleeps << [time, name]
+		@mutex[name].synchronize do
+			@times[name]= time
+			@sleeps << [time, name]
+		end
 	end
 
 	# Removes a timeout
 	def clear(name)
-		@times.delete(name)
-		@blocks.delete(name)
+		@mutex[name].synchronize do
+			@times.delete(name)
+			@blocks.delete(name)
+		end
 	end
 
 end
