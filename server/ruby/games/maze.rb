@@ -52,7 +52,6 @@ module Games
 			end
 			Thread.new do
 				@board.setSize(Width, Height)
-				@board.message("be the first to leave the MAZE")
 				newGame
 				loop do
 					while a= clients.receive
@@ -85,6 +84,7 @@ module Games
 						xy= @xy[client.number]
 						if xy[0] == 0 or xy[1] == 0
 							@board.addPoints(client.number, 1)
+							@board.message("It took #{client.name} #{@steps[client.number]} step to escape")
 							newGame
 						end
 					end
@@ -104,7 +104,7 @@ module Games
 			Height.times { |i| taken[[Width-1, i]]= true }
 			Width.times { |i| taken[[i, 0]]= true }
 			Width.times { |i| taken[[i, Height-1]]= true }
-			mazeGo(1, 1, taken) { |x, y| [1, 1] }
+			mazeGo(1, 1, taken, 1) { |x, y| [1, 1] }
 			Width.times do |x|
 				Height.times do |y|
 					next if taken[[x, y]]
@@ -113,7 +113,7 @@ module Games
 			end
 		end
 
-		def mazeGo(x, y, taken, &block)
+		def mazeGo(x, y, taken, length, &block)
 			x,y= block.call(x, y)
 			return if taken[[x, y]]
 			taken[[x, y]]= :way
@@ -122,6 +122,7 @@ module Games
 			mazeTest(x, y+1, taken)
 			mazeTest(x-1, y, taken)
 			mazeTest(x+1, y, taken)
+			@length[[x, y]]= length
 			a<< lambda { |x, y| [x, y-1] }
 			a<< lambda { |x, y| [x, y+1] }
 			a<< lambda { |x, y| [x-1, y] }
@@ -129,7 +130,7 @@ module Games
 			a= a.sort { |a, b| (rand*3).floor-1 }
 			while b= a.pop
 				if (rand*4).floor != 0
-					mazeGo(x, y, taken, &b)
+					mazeGo(x, y, taken, length+1, &b)
 				end
 			end
 		end
@@ -157,6 +158,7 @@ module Games
 			xy= @xy[client.number]
 			new= block.call(xy)
 			return if @board.getPixel(*new)==@color_wall
+			@steps[client.number]+= 1
 			removePlayer(client)
 			setPlayer(new[0], new[1], client)
 			@board.flush
@@ -188,12 +190,16 @@ module Games
 		end
 
 		def newGame
+			@length= Hash.new
+			@steps= Hash.new(0)
 			@board.setColor(@color_wall)
 			generateMaze
 			@start= [((Width-2)*rand).floor+1, ((Height-2)*rand).floor+1]
 			while @board.getPixel(@start[0], @start[1])
 				@start= [((Width-2)*rand).floor+1, ((Height-2)*rand).floor+1]
 			end
+			@board.message("the shortest path takes #{@length[@start]} steps")
+			@board.message("be the first to escape the MAZE")
 			@xy= []
 			@positions= Hash.new
 			@clients.each do |player|
