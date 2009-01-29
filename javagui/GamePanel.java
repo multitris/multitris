@@ -16,6 +16,8 @@ public class GamePanel extends JPanel
 	private int height = wheight-mheight;
 	private int vwidth = 1;
 	private int vheight = 1;
+	private int right3d = ((width/vwidth)/2);
+	private int up3d = -((height/vheight)/2);
 	private Color bgcolor=new Color(0,0,0);
 	private Color borderColor = new Color(255,255,255);
 	private Color [][] pixmatrix;
@@ -39,6 +41,8 @@ public class GamePanel extends JPanel
 			height=vheight*(width/vwidth);
 			width=vwidth*(height/vheight);
 		}
+		right3d = ((width/vwidth)/2);
+		up3d = -((height/vheight)/2);
 		FLUSH();
 	}
 	public void doLayout()
@@ -174,46 +178,45 @@ public class GamePanel extends JPanel
 		explodingPixels=new LinkedList<int[]>();
 		messages=new String[MAXMESSAGES];
 	}
+	private void draw3dRect(Graphics g, int x, int y, int wid, int hei, Color border, Color rect)
+	{
+		if (rect!=null)
+		{
+			g.setColor(rect);
+			g.fillRect(x, y, wid, hei);
+			g.fillPolygon(new int[]{x,x+right3d,x+wid+right3d,x+wid}
+						, new int[]{y, y+up3d, y+up3d, y}, 4);
+			g.fillPolygon(new int[]{x+wid,x+wid+right3d,x+wid+right3d,x+wid}
+			, new int[]{y+hei, y+hei+up3d, y+up3d, y}, 4);
+		}
+		g.setColor(border);
+		g.draw3DRect(x, y, wid, hei, true);
+		g.drawLine(x, y, x+right3d, y+up3d);//oben links 
+		g.drawLine(x+wid, y, x+wid+right3d, y+up3d);//oben rechts
+		g.drawLine(x+right3d, y+up3d, x+right3d+wid, y+up3d);//oben links nach oben rechts
+		g.drawLine(x+wid, y+hei, x+wid+right3d, y+hei+up3d);//unten rechts
+		g.drawLine(x+wid+right3d, y+up3d, x+wid+right3d, y+hei+up3d);//oben rechts nach unten rechts
+	}
 	public void paint(Graphics g)
 	{
-		if (explodingPixels.size()!=0)
-		{
-			g.setColor(new Color(255,0,255));
-			System.out.println("Exploding...");
-			for (int r=1;r<20;r+=2)
-			{
-				for(int i=0;i<explodingPixels.size();i++)
-				{
-					int x=explodingPixels.get(i)[0];
-					int y=explodingPixels.get(i)[1];
-					g.drawArc(x*(width/vwidth), y*(height/vheight), r, r, 0, 0);
-					//DOESNT RUN WELL!!! WINDOW IS NOT REFRESHED DURING PAINT()... FUCK OF JAVA!
-				}
-			}
-			explodingPixels.clear();
-		}
 		g.setColor(bgcolor);
 		g.fillRect(0, 0, wwidth, wheight);
-		g.setColor(borderColor);
-		g.drawRect(0, 0, width, height);
 		for (int x=0;x<vwidth;x++)
-			for (int y=0;y<vheight;y++)
+			for (int y=vheight-1;y>=0;y--)
 			{
 				if (pixmatrix[x][y]!=null)
 				{
-					g.setColor(pixmatrix[x][y]);
-					g.fillRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (height/vheight));
-					g.setColor(borderColor);
-					g.drawRect(x*(width/vwidth), y*(height/vheight), (width/vwidth), (height/vheight));
+					draw3dRect(g, x*(width/vwidth), y*(height/vheight), (width/vwidth), (height/vheight), 
+							borderColor, pixmatrix[x][y]);
 				}
 			}
-		
+		draw3dRect(g, 0, 0, width, height, borderColor, null);
 		int y=0;
 		for (int i=0;i<players.size();i++)
 			if(players.get(i).name!="")
 			{
 				g.setColor(players.get(i).color);
-				g.drawString(players.get(i).name+": "+players.get(i).points, width+5, 20+25*(y++));
+				g.drawString(players.get(i).name+": "+players.get(i).points, width+5+right3d, 20+25*(y++));
 			}
 		y=0;
 		g.setColor(new Color(255,255,255));
