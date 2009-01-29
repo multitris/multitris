@@ -28,6 +28,24 @@ module Multitris
 	# is to get the Comands from all Clients.
 	class Game
 
+		# The arguments for the Game as an array of Symbols.
+		# If the Symbols are in an additional array, these are
+		# optional arguments.
+		def self.args_pattern
+			[]
+		end
+
+		def self.format_args(args= args_pattern)
+			args.collect do |arg|
+				case arg
+				when Symbol
+					arg.to_s.upcase
+				when Array
+					"["+format_args(arg)+"]"
+				end
+			end.join(" ")
+		end
+
 		def initialize(board, clients)
 			@board= board
 			@clients= clients

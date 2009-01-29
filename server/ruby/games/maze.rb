@@ -28,11 +28,17 @@ module Games
 
 		Width= 32
 		Height= 32
+
+		def self.args_pattern
+			[[:width, :height]]
+		end
 		
-		def initialize(board, clients)
+		def initialize(board, clients, width= Width, height= Height)
 			super(board, clients)
 			@board= board
 			@clientes= clients
+			@width= width.to_i
+			@height= height.to_i
 			@positions= Hash.new
 			@color_wall= @board.newColor(nil)
 			Thread.new do
@@ -51,7 +57,7 @@ module Games
 				end
 			end
 			Thread.new do
-				@board.setSize(Width, Height)
+				@board.setSize(@width, @height)
 				newGame
 				loop do
 					while a= clients.receive
@@ -95,18 +101,18 @@ module Games
 
 		def generateMaze
 			@board.resetPixel
-			@board.drawHLine(2, Width-1, 0, @color_wall)
-			@board.drawHLine(0, Width-1, Height-1, @color_wall)
-			@board.drawVLine(0, 2, Height-1, @color_wall)
-			@board.drawVLine(Width-1, 0, Height, @color_wall)
+			@board.drawHLine(2, @width-1, 0, @color_wall)
+			@board.drawHLine(0, @width-1, @height-1, @color_wall)
+			@board.drawVLine(0, 2, @height-1, @color_wall)
+			@board.drawVLine(@width-1, 0, @height, @color_wall)
 			taken= Hash.new
-			Height.times { |i| taken[[0, i]]= true }
-			Height.times { |i| taken[[Width-1, i]]= true }
-			Width.times { |i| taken[[i, 0]]= true }
-			Width.times { |i| taken[[i, Height-1]]= true }
+			@height.times { |i| taken[[0, i]]= true }
+			@height.times { |i| taken[[@width-1, i]]= true }
+			@width.times { |i| taken[[i, 0]]= true }
+			@width.times { |i| taken[[i, @height-1]]= true }
 			mazeGo(1, 1, taken, 1) { |x, y| [1, 1] }
-			Width.times do |x|
-				Height.times do |y|
+			@width.times do |x|
+				@height.times do |y|
 					next if taken[[x, y]]
 					@board.setPixel(x, y, @color_wall)
 				end
@@ -189,15 +195,20 @@ module Games
 			end
 		end
 
+		# Generates a new start Position
+		def generateStart
+			@start= [((@width-2)*rand).floor+1, ((@height-2)*rand).floor+1]
+			while @board.getPixel(@start[0], @start[1])
+				@start= [((@width-2)*rand).floor+1, ((@height-2)*rand).floor+1]
+			end
+		end
+
 		def newGame
 			@length= Hash.new
 			@steps= Hash.new(0)
 			@board.setColor(@color_wall)
 			generateMaze
-			@start= [((Width-2)*rand).floor+1, ((Height-2)*rand).floor+1]
-			while @board.getPixel(@start[0], @start[1])
-				@start= [((Width-2)*rand).floor+1, ((Height-2)*rand).floor+1]
-			end
+			generateStart
 			@board.message("the shortest path takes #{@length[@start]} steps")
 			@board.message("be the first to escape the MAZE")
 			@xy= []

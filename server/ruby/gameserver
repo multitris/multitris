@@ -34,12 +34,12 @@ games= Hash.new
 games["example"]= Games::Example
 games["maze"]= Games::Maze
 
-unless ARGV.size == 3
+unless ARGV.size >= 3
 	STDERR.puts "usage: ./gameserver guiport clientport game"
 	STDERR.puts
 	STDERR.puts "The following games are available:"
-	games.each_key do |game|
-		STDERR.puts "\t#{game}"
+	games.each do |name, game|
+		STDERR.puts "\t#{name} #{game.format_args}"
 	end
 	exit 1
 end
@@ -67,7 +67,7 @@ Thread.new do
 	end
 end
 
-game= games[ARGV[2]].new(gameboard, client_concentrator)
+game= games[ARGV[2]].new(gameboard, client_concentrator, *ARGV[3..-1])
 
 loop do
 	sleep(1)

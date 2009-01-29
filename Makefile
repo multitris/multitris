@@ -16,7 +16,7 @@ ruby-web:
 	make -C client/ruby-web
 
 ruby-lib-doc:
-	rdoc -o ruby-lib/doc -S -N -d ruby-lib
+	rdoc -o ruby-lib/doc -S -N -U -d ruby-lib
 
 clean:
 	rm -f javagui/*.class
