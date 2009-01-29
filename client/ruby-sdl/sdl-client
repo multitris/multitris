@@ -146,6 +146,8 @@ Thread.new do
 					lambda { client.up }
 				when JOY_DOWN
 					lambda { client.down }
+				when 8
+				when 9
 				else
 					lambda { client.turn }
 				end
@@ -159,6 +161,10 @@ Thread.new do
 					$joy_up= 1.0 * event.value / 32768
 				when 3
 					$joy_up= 1.0 * event.value / 32768
+				when 12
+					$joy_up= (1.0 * event.value + 32768) / 32768
+				when 13
+					$joy_up= (1.0 * event.value + 32768) / 32768
 				end
 				nil
 			end
