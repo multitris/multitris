@@ -54,6 +54,9 @@ module Multitris
 			@board.each_points do |n, points|
 				gui.transmit(Comand.new(:points, n, points))
 			end
+			@board.last_messages do |msg|
+				gui.transmit(Comand.new(:message, msg))
+			end
 			@board.each_pixel do |x, y, value|
 				gui.transmit(Comand.new(:set, y, x, value))
 			end

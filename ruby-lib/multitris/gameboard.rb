@@ -47,6 +47,7 @@ module Multitris
 			@width= 0
 			@height= 0
 			@board= Hash.new
+			@message_log= []
 		end
 
 		# Sets the size of the GUI
@@ -231,9 +232,17 @@ module Multitris
 		# Draws a horizontal line.
 		# Write a message to the GUI.
 		def message(text)
+			@message_log << text
+			@message_log.shift if @message_log.size > 10
 			notify_observers(:message, text)
 		end
 
+		# Iterate over the last 10 messages.
+		def last_messages(&block)
+			@message_log.each do |msg|
+				block.call(msg)
+			end
+		end
 
 		# Executes a Comand on this gameboard every valid
 		# Comand execution should result in the same Comand
