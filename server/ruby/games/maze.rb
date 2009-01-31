@@ -29,8 +29,12 @@ module Games
 		Width= 32
 		Height= 32
 
-		def self.args_pattern
+		def self.args_names
 			[[:width, :height]]
+		end
+
+		def self.args_classes
+			[[Integer, Integer]]
 		end
 		
 		def initialize(board, clients, width= Width, height= Height)

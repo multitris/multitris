@@ -31,20 +31,68 @@ module Multitris
 		# The arguments for the Game as an array of Symbols.
 		# If the Symbols are in an additional array, these are
 		# optional arguments.
-		def self.args_pattern
+		def self.args_names
 			[]
 		end
 
-		def self.format_args(args= args_pattern)
+		# The classes for the Games arguments. Stored in the
+		# same way as the names in self.args_names. These
+		# classes are used to validate the arguments and to
+		# convert them to the wanted classes. Possible values
+		# are String, Int, and string object. If a string
+		# object is given, it must equal the string given as
+		# an argument.
+		def self.args_classes
+			[]
+		end
+
+		# Format the self.args_names in a readable way.
+		def self.args_format(args= args_names)
 			args.collect do |arg|
 				case arg
 				when Symbol
 					arg.to_s.upcase
 				when Array
-					"["+format_args(arg)+"]"
+					"["+args_format(arg)+"]"
 				end
 			end.join(" ")
 		end
+
+		# Validate wether the content of args matches
+		# self.args_classes . args must be an Array of
+		# Strings.
+		def self.args_validate(args, classes= nil)
+			final= !classes
+			classes= args_classes unless classes
+			args= args.clone
+			classes.each do |cl|
+				return false if args.size == 0 and !(Array === cl)
+				case cl
+				when String
+					if cl == args[0]
+						args.shift
+					else
+						return false
+					end
+				when Array
+					if size= args_validate(args, cl)	
+						args= args[args.size-size, args.size-1]
+					end
+				else
+					if ((cl == Integer) and (args[0]=~ /^\d+$/)) or (cl == String)
+						args.shift
+					else
+						return false
+					end
+				end
+			end
+			if final
+				args.size == 0
+			else
+				args.size
+			end
+		end
+			
 
 		def initialize(board, clients)
 			@board= board

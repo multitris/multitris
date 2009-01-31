@@ -34,12 +34,12 @@ games= Hash.new
 games["example"]= Games::Example
 games["maze"]= Games::Maze
 
-unless ARGV.size >= 3
+unless (ARGV.size >= 3) and games[ARGV[2]].args_validate(ARGV[3, ARGV.size-1])
 	STDERR.puts "usage: ./gameserver guiport clientport game"
 	STDERR.puts
 	STDERR.puts "The following games are available:"
 	games.each do |name, game|
-		STDERR.puts "\t#{name} #{game.format_args}"
+		STDERR.puts "\t#{name} #{game.args_format}"
 	end
 	exit 1
 end
