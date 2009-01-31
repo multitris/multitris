@@ -20,6 +20,7 @@
 # along with multitris.  If not, see <http://www.gnu.org/licenses/>.
 #++
 
+require 'thread'
 require 'multitris/comandsequence'
 require 'multitris/comand'
 require 'multitris/clientserver'
@@ -37,9 +38,11 @@ module Multitris
 	class ClientConcentrator
 		
 		def initialize
-			@clients= [nil]
+			@clients= []
 			@clients_next= 1
+			@clients_mutex= Mutex.new
 			@queue= []
+			@queue_mutex= Mutex.new
 		end
 
 		# Adds a new Client to the ClientConcentrator. The
@@ -47,35 +50,69 @@ module Multitris
 		# this Client.
 		def addClient(io)
 			client= ClientServer.new(io) do |cmd|
-				@queue<< [client, cmd]
+				@queue_mutex.synchronize do
+					@queue<< [client, cmd]
+				end
 				true
 			end
-			client.enumerate @clients_next
-			@clients_next+= 2
-			@clients[client.number]= client
+			@clients_mutex.synchronize do
+				client.enumerate @clients_next
+				@clients_next+= 2
+				@clients[client.number]= client
+			end
+			client.add_observer(self)
+		end
+
+		# Removes a ClientServer from the ClientConcentrator.
+		def rmClient(client)
+			@queue_mutex.synchronize do
+				@queue<< [client, Comand.new(:leave)]
+			end
+			@clients_mutex.synchronize do
+				@clients.delete(client)
+			end
 		end
 
 		# Recieves a Comand from a Client if one is waiting.
 		# Returns an array of the following form:
 		# [ClientServer, Comand].
 		def receive
-			@queue.shift
+			@queue_mutex.synchronize do
+				@queue.shift
+			end
 		end
 
 		# Iterates over all clients
 		def each(&block)
+			@clients_mutex.synchronize do
+				clients= @clients.clone
+			end
 			@clients.each do |client|
 				next unless client
 				block.call(client)
 			end
 		end
 
-		def update(cmd)
-			case cmd
-			when :color
-				client= @clients[cmd.args[0]]
-				if client
-					client.transmit(Comand.new(:ATTENTION, cmd.args[1], client.number))
+		# ClientConcentrator can receive updates from
+		# Gameboard's and ComandSequence's. On an update from
+		# a Gameboard, the ClientConcentrator notifies all
+		# clients if there color changes. On an exit update
+		# from a ComandSequence, the ClientConcentrator
+		# notifies the Game and and deletes ComandSequence.
+		def update(*args)
+			if args.size == 1 and Comand === args[0]
+				# update from GameBoard
+				case cmd
+				when :color
+					client= @clients[cmd.args[0]]
+					if client
+						client.transmit(Comand.new(:ATTENTION, cmd.args[1], client.number))
+					end
+				end
+			elsif args.size == 2 and ComandSequence === args[0]
+				# update from ComandSequence
+				if args[1] == :close
+					rmClient(args[0])
 				end
 			end
 		end

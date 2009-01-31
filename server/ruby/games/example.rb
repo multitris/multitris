@@ -29,7 +29,6 @@ module Games
 		def initialize(board, clients)
 			super(board, clients)
 			@board= board
-			@clientes= clients
 			@xy= []
 			Thread.new do
 				board.setSize(64, 64)
@@ -42,6 +41,11 @@ module Games
 							board.setPlayer(client.number, client.name)
 							randPosition(client)
 							client.start
+						when :leave
+							board.setPlayer(client.number, nil)
+							board.setPixel(@xy[client.number][0], @xy[client.number][1], nil)
+							board.flush
+							@xy.delete(client.number)
 						when :left
 							move(client) do |xy|
 								[xy[0]-1, xy[1]]

@@ -72,6 +72,10 @@ module Games
 							board.setPlayer(client.number, client.name)
 							setStart(client)
 							client.start
+						when :leave
+							board.setPlayer(client.number, nil)
+							removePlayer(client)
+							board.flush
 						when :left
 							move(client) do |xy|
 								[xy[0]-1, xy[1]]
