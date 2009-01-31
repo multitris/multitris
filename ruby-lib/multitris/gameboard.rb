@@ -21,6 +21,7 @@
 #++
 
 require 'observer'
+require 'thread'
 require 'multitris/comand'
 
 module Multitris
@@ -41,70 +42,95 @@ module Multitris
 		
 		def initialize
 			@colors= []
+			@color_mutex= Mutex.new
 			@next_color= 2
+			@color_next_mutex= Mutex.new
 			@players= []
+			@player_mutex= Mutex.new
 			@points= Hash.new(0)
+			@points_mutex= Mutex.new
 			@width= 0
 			@height= 0
+			@size_mutex= Mutex.new
 			@board= Hash.new
+			@pixel_mutex= Mutex.new
 			@message_log= []
+			@message_mutex= Mutex.new
 		end
 
 		# Sets the size of the GUI
 		def setSize(width, height)
-			@width= width
-			@height= height
+			@size_mutex.synchronize do
+				@width= width
+				@height= height
+			end
 			notify_observers(:size, height, width)
 		end
 
 		# Reads the size of the GUI
 		def getSize
-			[@width, @height]
+			@size_mutex.synchronize do
+				[@width, @height]
+			end
 		end
 
 		# Sets the value of one pixel. The meaning of value is
 		# is determined by the color map. Pixels can be set to
 		# nil.
 		def setPixel(x, y, value)
-			return if @board[[x, y]] == value
-			if value
-				@board[[x, y]]= value
-			else
-				@board.delete([x, y])
-				value= 0
+			@pixel_mutex.synchronize do
+				return if @board[[x, y]] == value
+				if value
+					@board[[x, y]]= value
+				else
+					@board.delete([x, y])
+					value= 0
+				end
+				notify_observers(:set, y, x, value)
 			end
-			notify_observers(:set, y, x, value)
 		end
 		
 		# Reads the value of one pixel.
 		def getPixel(x, y)
-			@board[[x, y]]
+			@pixel_mutex.synchronize do
+				@board[[x, y]]
+			end
 		end
 
 		# Determine wether the pixel at that coordinate is a
 		# valid pixel in the GUI.
 		def isPixel?(x, y)
-			x < 0 or y < 0 or x >= @width or y >= @height
+			@size_mutex.synchronize do
+				x < 0 or y < 0 or x >= @width or y >= @height
+			end
 		end
 
 		# Resets all pixel. This sets all pixels to nil.
 		def resetPixel
-			@board= Hash.new
-			notify_observers(:reset, "FIELD")
+			@pixel_mutex.synchronize do
+				@board= Hash.new
+				notify_observers(:reset, "FIELD")
+			end
 		end
 
 		# Iterate over all pixel which are not nil. Block will
 		# be given three arguments: x, y, value.
 		def each_pixel(&block)
-			@board.each_key do |key|
-				block.call(*(key + [@board[key]]))
+			board= nil
+			@pixel_mutex.synchronize do
+				board= @board.clone
+			end
+			board.each_key do |key, value|
+				block.call(key[0], key[1], value)
 			end
 		end
 
 		# Tell the GUI to draw all changes since the last
 		# flush.
 		def flush
-			notify_observers(:flush)
+			@pixel_mutex.synchronize do
+				notify_observers(:flush)
+			end
 		end
 
 		# Sets a color in the color map. Colors can be set to
@@ -114,30 +140,36 @@ module Multitris
 			if value == :rand
 				value= (rand*16777216).floor
 			end
-			if value
-				@colors[n]= value
-			else
-				@colors.delete(n)
-				value= 0
+			@color_mutex.synchronize do
+				if value
+					@colors[n]= value
+				else
+					@colors.delete(n)
+					value= 0
+				end
+				if Integer===value
+					value= value.to_s(16)
+					value= "0"*(6-value.size) + value
+				end
+				notify_observers(:color, n, value)
 			end
-			if Integer===value
-				value= value.to_s(16)
-				value= "0"*(6-value.size) + value
-			end
-			notify_observers(:color, n, value)
 		end
 
 		# Reads a color from the color map.
 		def getColor(n)
-			@colors[n]
+			@color_mutex.synchronize do
+				@colors[n]
+			end
 		end
 
 		alias :isColor? :getColor
 
 		# Resets all colors in the color map.
 		def resetColor
-			@colors= []
-			notify_observers(:reset, "COLOR")
+			@color_mutex.synchronize do
+				@colors= []
+				notify_observers(:reset, "COLOR")
+			end
 		end
 
 		# Allocates a number for a color. All numbers for non
@@ -147,8 +179,11 @@ module Multitris
 		# given, a random color will be picked. Returns the
 		# new number.
 		def newColor(value= :rand)
-			n= @next_color
-			@next_color+= 2
+			n= nil
+			@color_next_mutex.synchronize do
+				n= @next_color
+				@next_color+= 2
+			end
 			setColor(n, value)
 			n
 		end
@@ -156,8 +191,12 @@ module Multitris
 		# Iterates over all colors in the color map. Block
 		# will be given two arguments: n, color
 		def each_color(&block)
-			@colors.size.times do |i|
-				color= @colors[i]
+			colors= nil
+			@color_mutex.synchronize do
+				colors= @colors.clone
+			end
+			colors.size.times do |i|
+				color= colors[i]
 				next unless color
 				block.call(i, color)
 			end
@@ -165,33 +204,43 @@ module Multitris
 
 		# Sets a player name. A player name can be set to nil.
 		def setPlayer(n, name)
-			if name
-				@players[n]= name
-				notify_observers(:player, n, name)
-			else
-				@players.delete(n)
-				notify_observers(:player, n)
+			@player_mutex.synchronize do
+				if name
+					@players[n]= name
+					notify_observers(:player, n, name)
+				else
+					@players.delete(n)
+					notify_observers(:player, n)
+				end
 			end
 		end
 
 		# Reads a player name.
 		def getPlayer(n)
-			@players[n]
+			@player_mutex.synchronize do
+				@players[n]
+			end
 		end
 
 		alias :isPlayer? :getPlayer
 
 		# Resets all player names.
 		def resetPlayer
-			@players= []
-			notify_observers(:reset, "PLAYER")
+			@player_mutex.synchronize do
+				@players= []
+				notify_observers(:reset, "PLAYER")
+			end
 		end
 
 		# Iterates over all player names. Block will be given
 		# two arguments: n, name
 		def each_player(&block)
-			@players.size.times do |i|
-				player= @players[i]
+			players= nil
+			@player_mutex.synchronize do
+				players= @players.clone
+			end
+			players.size.times do |i|
+				player= players[i]
 				next unless player
 				block.call(i, player)
 			end
@@ -199,8 +248,10 @@ module Multitris
 
 		# Sets points for a player
 		def setPoints(n, points)
-			@points[n]= points
-			notify_observers(:points, n, points)
+			@points_mutex.synchronize do
+				@points[n]= points
+				notify_observers(:points, n, points)
+			end
 		end
 
 		# Adds points for a player
@@ -210,21 +261,29 @@ module Multitris
 
 		# Reads points for a player.
 		def getPoints(n)
-			@points[n]
+			@points_mutex.synchronize do
+				@points[n]
+			end
 		end
 
 		alias :isPoints? :getPoints
 
 		# Resets all player points.
 		def resetPoints
-			@points= Hash.new(0)
-			notify_observers(:reset, "POINTS")
+			@points_mutex.synchronize do
+				@points= Hash.new(0)
+				notify_observers(:reset, "POINTS")
+			end
 		end
 
 		# Iterates over all players points. Block will be given
 		# two arguments: n, points
 		def each_points(&block)
-			@points.each do |n, points|
+			points= nil
+			@points_mutex.synchronize do
+				points= @points.clone
+			end
+			points.each do |n, points|
 				block.call(n, points)
 			end
 		end
@@ -232,14 +291,20 @@ module Multitris
 		# Draws a horizontal line.
 		# Write a message to the GUI.
 		def message(text)
-			@message_log << text
-			@message_log.shift if @message_log.size > 10
-			notify_observers(:message, text)
+			@message_mutex.synchronize do
+				@message_log << text
+				@message_log.shift if @message_log.size > 10
+				notify_observers(:message, text)
+			end
 		end
 
 		# Iterate over the last 10 messages.
 		def last_messages(&block)
-			@message_log.each do |msg|
+			message_log= nil
+			@message_mutex.synchronize do
+				message_log= @message_log.clone
+			end
+			message_log.each do |msg|
 				block.call(msg)
 			end
 		end
