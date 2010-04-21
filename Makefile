@@ -1,5 +1,7 @@
 all: xjavaclient xjavagui xsnakeserver xmultitrisserver ruby-web ruby-lib-doc
 
+java: xjavaclient xjavagui xsnakeserver xmultitrisserver
+
 xjavagui:
 	javac javagui/MainWindow.java
 
